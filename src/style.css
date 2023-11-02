@@ -1,0 +1,41 @@
+@import url(./assets/style/ant.css);
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light dark;
+  color: #213547;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 立体盒子 */
+.Stereobox {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  z-index: 1;
+  --Stereo-radius: 10px;
+}
+.Stereobox::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  border-radius: calc(var(--Stereo-radius) - 1px);
+  border: 1px solid hsla(0, 0%, 100%, 0.22);
+  mask-image: linear-gradient(0deg, transparent, #000);
+  -webkit-mask-image: linear-gradient(0deg, transparent, #000);
+  z-index: -1;
+}
