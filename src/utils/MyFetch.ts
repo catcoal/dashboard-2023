@@ -60,7 +60,7 @@ class LemFetch {
           "Content-Type": "application/json",
           // Authorization: "Bearer " + Token.get(),
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYXV0aG9yIjoiTGVtbWluZyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5ODkzMzcwMSwiZXhwIjoxNjk4OTc2OTAxfQ.aI9j1u89GkCqrhuGt5r-5gc0lUhvPfOj9DmZlsqOais",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYXV0aG9yIjoiTGVtbWluZyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5ODk3NzU1MSwiZXhwIjoxNjk5MDIwNzUxfQ._fQSTeBbL0VGIOUZ1sCfIFy1FG8ulye5-tOh9zSaitI",
         },
         body: JSON.stringify(data),
       });

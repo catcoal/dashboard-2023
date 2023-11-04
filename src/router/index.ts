@@ -33,19 +33,27 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: "/post",
-    name: "Post",
-    redirect: "/post/list",
+    path: "/post_mange",
+    name: "Post_mange",
+    redirect: "/post_mange/list",
     meta: {
       label: "发文管理",
     },
     children: [
       {
-        path: "/post/list",
+        path: "/post_mange/list",
         name: "PostList",
         component: () => import("@/views/post/index.vue"),
         meta: {
           label: "文章列表",
+        },
+      },
+      {
+        path: "/post_mange/post",
+        name: "Post",
+        component: () => import("@/views/post/post.vue"),
+        meta: {
+          label: "发布文章",
         },
       },
     ],

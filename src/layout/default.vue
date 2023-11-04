@@ -41,14 +41,18 @@ import Header from "@/layout/components/header.vue";
 }
 
 .layout-header {
-    user-select: none;
+    position: sticky;
+    top: 0;
+    z-index: 9;
     padding: 0 20px;
-    background-color: #f5f5f5;
+    background-color: rgba(245, 245, 245, 0.5);
+    border-bottom: 1px solid rgba(245, 245, 245, 0.9);
+    backdrop-filter: blur(5px);
     line-height: unset;
 }
 
 .layout-content {
     padding: 0 20px 20px 20px;
-    background-color: #f5f5f5;
+    background-color: transparent;
 }
 </style>

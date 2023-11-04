@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Table, TableColumnsType, TableProps, Tag } from 'ant-design-vue';
-import { FetchPostList, IPost, PostStatus } from "@/api/post";
+import { FetchPostList, PostStatus, ResPost } from "@/api/post";
 import { onMounted, ref } from 'vue';
 
 const columns: TableColumnsType = [
@@ -36,7 +36,7 @@ const columns: TableColumnsType = [
     }
 ];
 
-const tableData = ref<IPost[]>();
+const tableData = ref<ResPost[]>();
 const tableLoading = ref(false);
 const pagination = ref({
     total: 0,
