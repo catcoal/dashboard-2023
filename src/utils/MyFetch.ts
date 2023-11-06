@@ -1,5 +1,7 @@
-import { Token } from "@/utils/auth";
-// import { LemVantDialog } from "./lem-vant";
+import Token from "@/utils/auth";
+import { LemAntModal } from "@/utils/MyAnt";
+import router from "@/router";
+import { useAuth } from "@/stores/auth";
 
 export interface IResultData<T> {
   data?: T;
@@ -27,14 +29,18 @@ class LemFetch {
       return response.json();
     } else {
       if (response.status === 401) {
-        //   // 权限错误
-        //   LemVantDialog({
-        //     message: "权限错误,请重新登录!",
-        //   }).then(() => {
-        Token.clear();
-        //     window.location.reload();
-        //   });
-        //   return;
+        // 权限错误
+        LemAntModal({
+          title: "验证失败",
+          content: "身份已过期，请重新登录",
+          okText: "重新登录",
+          okCancel: false,
+          onOk: () => {
+            useAuth().signOut();
+            router.push("/");
+          },
+        });
+        return;
       }
       // 请求失败，处理错误信息
       let errorMessage = "未知错误";
@@ -58,9 +64,9 @@ class LemFetch {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          // Authorization: "Bearer " + Token.get(),
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYXV0aG9yIjoiTGVtbWluZyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5ODk3NzU1MSwiZXhwIjoxNjk5MDIwNzUxfQ._fQSTeBbL0VGIOUZ1sCfIFy1FG8ulye5-tOh9zSaitI",
+          Authorization: Token.get() || "",
+          // Authorization:
+          //   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYXV0aG9yIjoiTGVtbWluZyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5ODk3NzU1MSwiZXhwIjoxNjk5MDIwNzUxfQ._fQSTeBbL0VGIOUZ1sCfIFy1FG8ulye5-tOh9zSaitI",
         },
         body: JSON.stringify(data),
       });
@@ -76,7 +82,7 @@ class LemFetch {
       const response = await fetch(`${this.baseUrl}${url}`, {
         method: "GET",
         headers: {
-          Authorization: "Bearer " + Token.get(),
+          Authorization: Token.get() || "",
         },
       });
       if (response.status >= 200 && response.status < 300) {

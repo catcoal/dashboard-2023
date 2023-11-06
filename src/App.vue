@@ -5,7 +5,8 @@ import { ConfigProvider } from "ant-design-vue";
 
 <template>
   <ConfigProvider :theme="{ token: { colorPrimary: '#00b96b' } }">
-    <Layout></Layout>
+    <RouterView></RouterView>
+    <!-- <Layout></Layout> -->
   </ConfigProvider>
 </template>
 

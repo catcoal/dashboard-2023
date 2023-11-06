@@ -1,5 +1,5 @@
 const TokenKey = "Authorization";
-export const Token = {
+const Token = {
   get() {
     return localStorage.getItem(TokenKey);
   },
@@ -10,3 +10,5 @@ export const Token = {
     return localStorage.removeItem(TokenKey);
   },
 };
+
+export default Token;

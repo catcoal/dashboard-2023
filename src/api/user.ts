@@ -1,6 +1,6 @@
 import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
 
-type UserRole = "Admin" | "Custom";
+export type UserRole = "Admin" | "Custom";
 
 export interface IUser {
   account: string;

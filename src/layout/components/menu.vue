@@ -2,12 +2,13 @@
 import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons-vue';
 import { Menu, ItemType, MenuProps } from 'ant-design-vue';
 import { reactive, VueElement, h, computed, ref, onMounted } from 'vue';
-import { useRouter, useRoute, RouteRecordRaw, RouteMeta } from "vue-router"
+import { useRouter, useRoute, RouteRecordRaw, RouteMeta } from "vue-router";
+import { MainRoutes } from "@/router/modules/main-route";
 
 const router = useRouter();
 const route = useRoute();
 
-const routes = computed(() => router.options.routes as RouteRecordRaw[]);
+const routes = computed(() => MainRoutes as RouteRecordRaw[]);
 const items: ItemType[] = reactive(transformRoutes(routes.value));
 const selectedMenuKeys = ref<string[]>([]);
 
@@ -28,8 +29,8 @@ function transformRoutes(routes: RouteRecordRaw[]): ItemType[] {
                 icon: icon || '',
                 label,
                 children: children && children.length > 0 ? transformRoutes(children) : undefined,
-            } as ItemType;
-        });
+            } as unknown as ItemType
+        })
 }
 
 const handleClick: MenuProps["onClick"] = (e) => {
