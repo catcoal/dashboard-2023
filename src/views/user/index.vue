@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { Table, TableColumnsType, TableProps, Tag } from 'ant-design-vue';
-import { FetchUserList, IUser } from "@/api/user";
+import Gravatar from "@/components/Gravatar/Gravatar.vue"
+import AddUserPop from './components/add-user-pop.vue';
+import { Table, TableColumnsType, TableProps, Tag, Button, message } from 'ant-design-vue';
+import { FetchUserList, IUser, DelUser } from "@/api/user";
 import { onMounted, ref } from 'vue';
+import { LemAntModal } from '@/utils/MyAnt';
 
+const showAddUserForm = ref(false);
 const columns: TableColumnsType = [
     {
         title: "ID",
@@ -12,10 +16,10 @@ const columns: TableColumnsType = [
         title: "用户名",
         dataIndex: "author",
     },
-    {
-        title: "帐号",
-        dataIndex: "account",
-    },
+    // {
+    //     title: "帐号",
+    //     dataIndex: "account",
+    // },
     {
         title: "邮箱",
         dataIndex: "email",
@@ -31,6 +35,10 @@ const columns: TableColumnsType = [
     {
         title: "规则",
         dataIndex: "role"
+    },
+    {
+        title: "操作",
+        dataIndex: "operation"
     }
 ];
 
@@ -43,9 +51,37 @@ const pagination = ref({
 })
 
 onMounted(() => {
-    tableLoading.value = true;
     FetchTableData();
 })
+
+// 新增用户
+const AddUser = {
+    pop() {
+        showAddUserForm.value = true;
+    },
+    success() {
+        showAddUserForm.value = false;
+        FetchTableData();
+    }
+}
+
+// 删除用户
+const handleDelUser = (user: IUser) => {
+    LemAntModal({
+        title: "提示",
+        content: `确认删除${user.email}用户吗?`,
+        okType: 'danger',
+        onOk: async () => {
+            try {
+                await DelUser(user.id)
+                message.success('删除成功')
+                FetchTableData()
+            } catch (err: any) {
+                console.log(err)
+            }
+        }
+    })
+}
 
 const handleTableChange: TableProps['onChange'] = (pag, filters, sorter) => {
     pagination.value.current = pag.current!;
@@ -53,6 +89,7 @@ const handleTableChange: TableProps['onChange'] = (pag, filters, sorter) => {
 }
 
 const FetchTableData = async () => {
+    tableLoading.value = true;
     try {
         const { data, meta } = await FetchUserList({
             page: pagination.value.current,
@@ -72,18 +109,50 @@ const FetchTableData = async () => {
 </script>
 
 <template>
+    <div class="header-wrap">
+        <Button @click="AddUser.pop" type="primary">新增用户</Button>
+    </div>
     <Table :loading="tableLoading" :scroll="{ x: true }" :row-key="record => record.id" :columns="columns"
         :pagination="pagination" :data-source="tableData" @change="handleTableChange">
         <template #bodyCell="{ column, record }">
-            <template v-if="column.dataIndex == 'authorUrl'">
+            <template v-if="column.dataIndex == 'email'">
+                <div class="email-wrap">
+                    <div class="avatar">
+                        <Gravatar :email="record.email"></Gravatar>
+                    </div>
+                    <span>{{ record.email }}</span>
+                </div>
+            </template>
+            <template v-else-if="column.dataIndex == 'authorUrl'">
                 <a :href="record.authorUrl" target="_blank">{{ record.authorUrl }}</a>
             </template>
-            <template v-if="column.dataIndex == 'role'">
+            <template v-else-if="column.dataIndex == 'role'">
                 <Tag :color="record.role == 'Admin' ? 'green' : 'gold'">{{ record.role == 'Admin' ? '管理员' : '游客' }}
                 </Tag>
             </template>
+            <template v-else-if="column.dataIndex == 'operation'">
+                <Button @click="handleDelUser(record as IUser)" size="small" type="text" danger>删除</Button>
+            </template>
         </template>
     </Table>
+    <AddUserPop @success="AddUser.success" :open="showAddUserForm" @cancel="showAddUserForm = false"></AddUserPop>
 </template>
 
-<style scoped></style>
+<style scoped>
+.header-wrap {
+    margin-bottom: 10px;
+}
+
+.email-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+</style>

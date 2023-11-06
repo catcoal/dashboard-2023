@@ -15,6 +15,7 @@ export enum PostType {
 
 export interface IPost {
   title: string;
+  enTitle: string;
   description: string;
   content: string;
   authorId: number;

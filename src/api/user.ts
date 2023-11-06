@@ -13,6 +13,15 @@ export interface IUser {
   role: UserRole;
 }
 
+export interface NewUser {
+  author: string;
+  email: string;
+  password: string;
+  account?: string;
+  authorUrl?: string;
+  role?: UserRole;
+}
+
 interface UserQuery {
   role?: UserRole;
 }
@@ -25,4 +34,12 @@ export const FetchUserList = (
 
 export const FetchMeInfo = () => {
   return LemFetch.get("/admin/user/me");
+};
+
+export const AddUser = (data: NewUser) => {
+  return LemFetch.post("/admin/user", data);
+};
+
+export const DelUser = (id: number) => {
+  return LemFetch.delete("/admin/user/" + id);
 };

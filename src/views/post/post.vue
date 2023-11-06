@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import DragImages from "@/components/DragImages/DragImages.vue";
+import Editor from "./components/editor.vue";
+import { pinyin } from "pinyin-pro"
 import { IPost, NewPost, PostStatus } from "@/api/post";
 import { FetchTagList, ITag } from "@/api/tag";
 import { FetchUserList, FetchMeInfo, IUser } from "@/api/user";
 import { FormItem, Input, Textarea, Select, SelectOption, Button, Switch, Row, Col as ColItem, Form, Space } from 'ant-design-vue';
 import { onMounted, ref, computed } from "vue";
-import Editor from "./components/editor.vue";
 
 const FormData = ref<IPost>({
     title: '',
+    enTitle: '',
     description: '',
     content: '',
     authorId: 0,
@@ -29,6 +31,10 @@ onMounted(async () => {
     getAdmin();
     getTag();
 })
+
+const handleTitle = () => {
+    FormData.value.enTitle = (pinyin(FormData.value.title, { toneType: 'none', type: 'array' })).join('-');
+}
 
 // 获取管理员
 const getAdmin = async () => {
@@ -57,8 +63,11 @@ const Post = () => {
     <Form :model="FormData">
         <Row :gutter="10">
             <col-item :flex="1">
+                <FormItem label="唯一标识">
+                    <Textarea v-model:value="FormData.enTitle" autoSize></Textarea>
+                </FormItem>
                 <FormItem label="标题">
-                    <Input v-model:value="FormData.title" />
+                    <Textarea @input="handleTitle" v-model:value="FormData.title" autoSize></Textarea>
                 </FormItem>
                 <FormItem label="描述">
                     <Textarea v-model:value="FormData.description" autoSize></Textarea>
