@@ -13,4 +13,10 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
   },
+  optimizeDeps: {
+    include: ["ckeditor5-custom-build"],
+  },
+  build: {
+    commonjsOptions: { exclude: ["ckeditor5-custom-build"], include: [] },
+  },
 });

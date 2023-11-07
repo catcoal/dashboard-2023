@@ -61,8 +61,8 @@ const Post = () => {
 </script>
 <template>
     <Form :model="FormData">
-        <Row :gutter="10">
-            <col-item :flex="1">
+        <Row :wrap="false" :gutter="20">
+            <col-item :md="{ span: 10 }" :lg="{ span: 8 }">
                 <FormItem label="唯一标识">
                     <Textarea v-model:value="FormData.enTitle" autoSize></Textarea>
                 </FormItem>
@@ -111,7 +111,7 @@ const Post = () => {
                     <DragImages :urls="covers" />
                 </FormItem>
             </col-item>
-            <col-item :flex="9">
+            <col-item :md="{ span: 14 }" :lg="{ span: 16 }">
                 <FormItem>
                     <Editor></Editor>
                     <!-- <Textarea v-model:value="FormData.content" autosize></Textarea> -->

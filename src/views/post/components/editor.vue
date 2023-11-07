@@ -1,48 +1,56 @@
 <script setup lang="ts">
-import Quill from "quill";
-import "quill/dist/quill.snow.css";
-import { VNodeRef, onMounted, ref, reactive } from "vue";
+import Editor from 'ckeditor5-custom-build';
+import { EditorConfig } from '@ckeditor/ckeditor5-core/src/editor/editorconfig';
+import { customUploadImage } from "./ckeditor";
+import { ref } from 'vue';
 
-const editor = ref<VNodeRef>();
-const quillInstance = ref<Quill | null>(null); // 使用 ref 包装 Quill 实例
+const editorData = ref('');
+const editor = Editor;
+const editorConfig: EditorConfig = {
+    extraPlugins: [customUploadImage as any],
+    removePlugins: ["Title", "ImageInsert", "Style", "Essentials"],
+    toolbar: {
+        shouldNotGroupWhenFull: true
+    }
+}
 
-onMounted(() => {
-    quillInstance.value = new Quill(editor.value as string, {
-        theme: "snow", // 根据需要选择主题
-        modules: {
-            toolbar: [
-                [{ header: [1, 2, false] }],
-                ["bold", "italic", "underline"],
-                ["link"],
-                ["image", "blockquote", "code-block"],
-                [{ list: "ordered" }, { list: "bullet" }],
-            ]
-        },
-    });
-});
+const getData = () => {
+    console.log(editorData.value)
+}
+
+const onReady = (editor: Editor) => {
+}
 
 </script>
 
 <template>
     <div class="editor-container">
-        <div ref="editor">
-
-        </div>
+        <ckeditor @ready="onReady" :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
     </div>
 </template>
 
+<style>
+.editor-container * {
+    list-style: revert;
+    margin: revert;
+    padding: revert;
+}
+</style>
+
 <style scoped>
-:deep(.ql-toolbar.ql-snow) {
-    border-radius: 10px 10px 0 0;
+:deep(.ck.ck-toolbar) {
+    border-radius: 10px 10px 0 0 !important;
 }
 
-:deep(.ql-container.ql-snow) {
-    border-radius: 0 0 10px 10px;
-    min-height: 100px;
-    background-color: #FFF;
+:deep(.ck.ck-editor__main>.ck-editor__editable) {
+    border-radius: 0 0 10px 10px !important;
 }
 
-:deep(.ql-editor) {
-    min-height: 100px;
+:deep(.ck.ck-editor__main>.ck-editor__editable.ck-focused) {
+    border: 1px solid #53b672 !important;
+}
+
+:deep(.ck.ck-content) {
+    min-height: 400px;
 }
 </style>
