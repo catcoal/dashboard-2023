@@ -6,6 +6,7 @@
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 
 import { Alignment } from "@ckeditor/ckeditor5-alignment";
+import { Autoformat } from "@ckeditor/ckeditor5-autoformat";
 import { Autosave } from "@ckeditor/ckeditor5-autosave";
 import {
   Bold,
@@ -18,13 +19,14 @@ import { BlockQuote } from "@ckeditor/ckeditor5-block-quote";
 import { CodeBlock } from "@ckeditor/ckeditor5-code-block";
 import { Essentials } from "@ckeditor/ckeditor5-essentials";
 import { FindAndReplace } from "@ckeditor/ckeditor5-find-and-replace";
-import { FontColor, FontFamily } from "@ckeditor/ckeditor5-font";
-import { Heading, Title } from "@ckeditor/ckeditor5-heading";
-import { Highlight } from "@ckeditor/ckeditor5-highlight";
 import {
-  GeneralHtmlSupport,
-  HtmlComment,
-} from "@ckeditor/ckeditor5-html-support";
+  FontBackgroundColor,
+  FontColor,
+  FontFamily,
+} from "@ckeditor/ckeditor5-font";
+import { Heading } from "@ckeditor/ckeditor5-heading";
+import { Highlight } from "@ckeditor/ckeditor5-highlight";
+import { HtmlEmbed } from "@ckeditor/ckeditor5-html-embed";
 import {
   AutoImage,
   Image,
@@ -36,16 +38,14 @@ import {
   ImageUpload,
 } from "@ckeditor/ckeditor5-image";
 import { AutoLink, Link, LinkImage } from "@ckeditor/ckeditor5-link";
-import { List, ListProperties, TodoList } from "@ckeditor/ckeditor5-list";
+import { List, TodoList } from "@ckeditor/ckeditor5-list";
 import { Markdown } from "@ckeditor/ckeditor5-markdown-gfm";
 import { MediaEmbed, MediaEmbedToolbar } from "@ckeditor/ckeditor5-media-embed";
-import { Mention } from "@ckeditor/ckeditor5-mention";
 import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
 import { RemoveFormat } from "@ckeditor/ckeditor5-remove-format";
 import { StandardEditingMode } from "@ckeditor/ckeditor5-restricted-editing";
 import { SourceEditing } from "@ckeditor/ckeditor5-source-editing";
-import { Style } from "@ckeditor/ckeditor5-style";
-import { SimpleUploadAdapter } from "@ckeditor/ckeditor5-upload";
+import { Base64UploadAdapter } from "@ckeditor/ckeditor5-upload";
 import { WordCount } from "@ckeditor/ckeditor5-word-count";
 
 // You can read more about extending the build with additional plugins in the "Installing plugins" guide.
@@ -56,19 +56,21 @@ class Editor extends ClassicEditor {
     Alignment,
     AutoImage,
     AutoLink,
+    Autoformat,
     Autosave,
+    Base64UploadAdapter,
     BlockQuote,
     Bold,
     Code,
     CodeBlock,
     Essentials,
     FindAndReplace,
+    FontBackgroundColor,
     FontColor,
     FontFamily,
-    GeneralHtmlSupport,
     Heading,
     Highlight,
-    HtmlComment,
+    HtmlEmbed,
     Image,
     ImageCaption,
     ImageInsert,
@@ -80,19 +82,14 @@ class Editor extends ClassicEditor {
     Link,
     LinkImage,
     List,
-    ListProperties,
     Markdown,
     MediaEmbed,
     MediaEmbedToolbar,
-    Mention,
     Paragraph,
     RemoveFormat,
-    SimpleUploadAdapter,
     SourceEditing,
     StandardEditingMode,
     Strikethrough,
-    Style,
-    Title,
     TodoList,
     Underline,
     WordCount,
@@ -104,31 +101,31 @@ class Editor extends ClassicEditor {
         "undo",
         "redo",
         "heading",
-        "style",
+        "fontColor",
         "fontFamily",
-        "bold",
-        "italic",
+        "fontBackgroundColor",
         "findAndReplace",
         "|",
+        "bold",
+        "italic",
         "link",
-        "imageUpload",
-        "imageInsert",
-        "mediaEmbed",
-        "|",
-        "blockQuote",
         "bulletedList",
         "numberedList",
-        "code",
-        "codeBlock",
+        "alignment",
         "|",
+        "imageInsert",
+        "mediaEmbed",
+        "blockQuote",
+        "todoList",
+        "htmlEmbed",
+        "highlight",
         "removeFormat",
+        "codeBlock",
+        "code",
         "sourceEditing",
+        "|",
         "strikethrough",
         "underline",
-        "fontColor",
-        "highlight",
-        "alignment",
-        "todoList",
       ],
     },
     language: "zh-cn",
