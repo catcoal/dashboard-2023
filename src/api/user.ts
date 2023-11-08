@@ -2,6 +2,15 @@ import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
 
 export type UserRole = "Admin" | "Custom";
 
+export interface ResMe {
+  id: number;
+  email: string;
+  author: string;
+  role: UserRole;
+  exp?: number;
+  iat?: number;
+}
+
 export interface IUser {
   account: string;
   author: string;
@@ -32,7 +41,7 @@ export const FetchUserList = (
   return LemFetch.get<PageOptions>(`/admin/user`, data);
 };
 
-export const FetchMeInfo = () => {
+export const FetchMineInfo = (): Promise<IResultData<ResMe>> => {
   return LemFetch.get("/admin/user/me");
 };
 

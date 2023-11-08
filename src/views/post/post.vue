@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import DragImages from "@/components/DragImages/DragImages.vue";
+import Gravatar from "@/components/Gravatar/Gravatar.vue";
 import Editor, { backData } from "./components/editor.vue";
 import { pinyin } from "pinyin-pro"
-import { IPost, ResPost, NewPost, PostStatus, FetchPostDetail, UpdatePost } from "@/api/post";
+import { IPost, NewPost, PostStatus, FetchPostDetail, UpdatePost } from "@/api/post";
 import { FetchTagList, ITag } from "@/api/tag";
-import { FetchUserList, FetchMeInfo, IUser } from "@/api/user";
+import { FetchUserList, FetchMineInfo, IUser } from "@/api/user";
 import { FormItem, Spin, Textarea, Select, SelectOption, Button, Switch, Row, Col as ColItem, Form, Space, message } from 'ant-design-vue';
 import { Rule } from "ant-design-vue/es/form";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useMe } from "@/stores/me";
 
+const meStore = useMe()
 const route = useRoute();
 const postFormRef = ref();
 const submitLoading = ref(false);
@@ -25,7 +28,7 @@ const FormData = ref<IPost>({
     status: 'Private' as PostStatus.Private,
     isRecommend: false,
     isTop: false,
-    commentEnabled: false
+    commentEnabled: true
 });
 const rules: Record<string, Rule[]> = {
     enTitle: [{ required: true, message: '请输入文章唯一标识', trigger: 'blur' }],
@@ -38,7 +41,7 @@ const isUpdate = computed(() => route.params.id || false);
 
 onMounted(async () => {
     // 获取当前用户
-    FormData.value.authorId = (await FetchMeInfo()).data.id;
+    FormData.value.authorId = meStore.MineInfo?.id!;
     getAdmin();
     getTag();
     // 编辑
@@ -121,7 +124,7 @@ const SubmitDraft = () => {
 <template>
     <Spin tip="Loading..." :spinning="pageLoading">
         <Form ref="postFormRef" :model="FormData" :rules="rules">
-            <Row :wrap="false" :gutter="20">
+            <Row :wrap="true" :gutter="20">
                 <col-item :md="{ span: 10 }" :lg="{ span: 8 }">
                     <FormItem label="唯一标识" name="enTitle">
                         <Textarea v-model:value="FormData.enTitle" autoSize></Textarea>
@@ -143,8 +146,15 @@ const SubmitDraft = () => {
                     <FormItem label="作者">
                         <Select v-model:value="FormData.authorId">
                             <SelectOption v-for="user in adminList" :key="user.id" :value="user.id">
-                                <h2>{{ user.author }}</h2>
-                                <p>{{ user.email }}</p>
+                                <div class="user-wrap">
+                                    <div class="user-avatar">
+                                        <Gravatar :email="user.email"></Gravatar>
+                                    </div>
+                                    <div class="user-info">
+                                        <h2>{{ user.author }}</h2>
+                                        <p>{{ user.email }}</p>
+                                    </div>
+                                </div>
                             </SelectOption>
                         </Select>
                     </FormItem>
@@ -155,15 +165,15 @@ const SubmitDraft = () => {
                             </SelectOption>
                         </Select>
                     </FormItem>
-                    <Space :size="30">
+                    <Space :size="[30, 0]" :wrap="true">
+                        <FormItem label="评论?">
+                            <Switch v-model:checked="FormData.commentEnabled"></Switch>
+                        </FormItem>
                         <FormItem label="置顶?">
                             <Switch v-model:checked="FormData.isTop"></Switch>
                         </FormItem>
                         <FormItem label="推荐?">
                             <Switch v-model:checked="FormData.isRecommend"></Switch>
-                        </FormItem>
-                        <FormItem label="评论?">
-                            <Switch v-model:checked="FormData.commentEnabled"></Switch>
                         </FormItem>
                     </Space>
                     <FormItem label="封面">
@@ -187,17 +197,31 @@ const SubmitDraft = () => {
 </template>
 
 <style scoped>
-.ant-select-selection-item>h2 {
+.user-wrap {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    line-height: normal;
+}
+
+.ant-select-selection-item .user-info>p {
+    display: inline;
+    opacity: 0.6;
+    font-size: 12px;
+}
+
+.ant-select-selection-item .user-info>h2 {
     font-size: 14px;
     font-weight: 400;
     display: inline;
     margin-right: 10px;
-}
-
-.ant-select-selection-item>p {
-    display: inline;
-    opacity: 0.6;
-    font-size: 12px;
 }
 
 .ant-select-item h2 {
@@ -209,6 +233,7 @@ const SubmitDraft = () => {
     font-size: 12px;
     opacity: 0.5;
 }
+
 
 .post-footer-mask {
     height: 50px;
