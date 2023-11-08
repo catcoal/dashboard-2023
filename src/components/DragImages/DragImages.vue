@@ -1,7 +1,7 @@
 <template>
     <div class="drag-container">
         <div v-for="(item, index) in items" :key="index" class="drag-item Stereobox" @dragstart="startDrag(index, $event)"
-            @dragover="dragOver(index, $event)" @dragend="endDrag" draggable="true">
+            @dragover="dragOver(index, $event)" @dragend="endDrag" draggable>
             <span class="drag-line" :class="{ 'drag-line-highlight': showLine === index && showLineBefore }"></span>
             <div class="drag-item-inner">
                 <img :src="item" alt="" srcset="">
@@ -12,7 +12,10 @@
             <input @change="uploadFile" multiple type="file" />
             <LoadingOutlined v-if="isUploading"></LoadingOutlined>
             <PlusOutlined v-else></PlusOutlined>
-            <div class="ant-upload-text">上传{{ isUploading ? '中...' : '' }}</div>
+            <div class="ant-upload-text">
+                <p>上传{{ isUploading ? '中...' : '' }}</p>
+                <span>(拖放上传)</span>
+            </div>
         </div>
     </div>
 </template>
@@ -23,6 +26,8 @@ import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
 import { UploadFile, ResFile } from "@/api/common";
 import { IResultData } from '@/utils/MyFetch';
 import { LemAntModal } from '@/utils/MyAnt';
+import { ThemeColorRgb } from '@/config/app';
+
 
 const props = defineProps<{ urls: string[] }>();
 const emit = defineEmits(['Success']);
@@ -59,17 +64,20 @@ let showLine = ref(-1);
 let showLineBefore = ref(true);
 
 const startDrag = (index: number, event: DragEvent) => {
-    if (event.dataTransfer) {
-        event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('text/plain', index.toString());
+    let target = event.target as HTMLElement;
+    let dragItemEl = target.closest('.drag-item');
+    if (event.dataTransfer && dragItemEl) {
+        event.dataTransfer.effectAllowed = 'copy';
+        event.dataTransfer.dropEffect = 'link';
+        event.dataTransfer.setDragImage(dragItemEl, 0, 0);
         draggingIndex.value = index;
     }
 };
-
+// https://gw.alipayobjects.com/zos/k/mi/152.jpg?x-oss-process=image/resize,w_640/format,webp
 const dragOver = (index: number, event: DragEvent) => {
     event.preventDefault();
     const dragging = draggingIndex.value;
-    if (index !== dragging) {
+    if (index !== dragging && dragging >= 0) {
         const draggedItem = items.value[dragging];
         items.value.splice(dragging, 1);
         items.value.splice(index, 0, draggedItem);
@@ -109,14 +117,34 @@ const endDrag = () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 16px;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     border: 1px dashed #999;
     color: #666;
     border-radius: 10px;
     font-weight: bold;
     min-height: 100px;
+}
+
+.upload-item:hover {
+    border-color: rgba(v-bind(ThemeColorRgb), 1);
+    background-color: rgba(v-bind(ThemeColorRgb), 0.1);
+}
+
+.upload-item>span {
+    margin-top: 20px;
+}
+
+
+.ant-upload-text {
+    text-align: center;
+    font-size: 12px;
+}
+
+.ant-upload-text>span {
+    opacity: 0.5;
+    font-size: 12px;
 }
 
 .upload-item>input {

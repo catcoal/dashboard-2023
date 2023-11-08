@@ -19,7 +19,7 @@ export interface IPost {
   description: string;
   content: string;
   authorId: number;
-  covers?: string;
+  covers?: string[];
   weight?: number;
   status?: PostStatus;
   isTop?: boolean;
@@ -57,4 +57,9 @@ export const FetchPostList = (
 // 新增文章
 export const NewPost = (data: IPost) => {
   return LemFetch.post("/admin/post", data);
+};
+
+// 删除文章
+export const DelPost = (id: number) => {
+  return LemFetch.delete("/admin/post/" + id);
 };

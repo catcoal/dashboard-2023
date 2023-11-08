@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { Table, TableColumnsType, TableProps, Tag } from 'ant-design-vue';
-import { FetchPostList, PostStatus, ResPost } from "@/api/post";
-import { onMounted, ref } from 'vue';
+import { ThemeColor, ThemeColorRgb } from '@/config/app';
+import { Space, Table, TableColumnsType, TableProps, Tag, Image, ImagePreviewGroup, Button, message } from 'ant-design-vue';
+import { FileImageOutlined } from '@ant-design/icons-vue';
+import { DelPost, FetchPostList, IPost, PostStatus, ResPost } from "@/api/post";
+import { onMounted, ref, h } from 'vue';
+import { LemAntModal } from '@/utils/MyAnt';
 
 const columns: TableColumnsType = [
     {
         title: "封面",
         dataIndex: "covers",
-        // width: "1000px"
+        width: 80
     },
     {
         title: "ID",
@@ -20,7 +23,6 @@ const columns: TableColumnsType = [
     {
         title: "标题",
         dataIndex: "title",
-        // width: "60%",
     },
     {
         title: "置顶?",
@@ -33,6 +35,11 @@ const columns: TableColumnsType = [
     {
         title: "推荐?",
         dataIndex: "isRecommend"
+    },
+    {
+        title: "操作",
+        dataIndex: "operation",
+        fixed: 'right',
     }
 ];
 
@@ -69,6 +76,32 @@ const FetchTableData = async () => {
         tableLoading.value = false;
     }
 }
+
+// 删除文章
+const handleDelPost = (post: ResPost) => {
+    LemAntModal({
+        title: "提示",
+        content: h('span', [
+            h('span', '确认删除 '),
+            h('b', {
+                style: {
+                    color: ThemeColor
+                }
+            }, post.title),
+            h('span', ' 吗?'),
+        ]),
+        okType: 'danger',
+        onOk: async () => {
+            try {
+                await DelPost(post.id)
+                message.success('删除成功')
+                FetchTableData()
+            } catch (err: any) {
+                console.log(err)
+            }
+        }
+    })
+}
 </script>
 
 <template>
@@ -78,11 +111,23 @@ const FetchTableData = async () => {
             更多
         </template>
         <template #expandedRowRender="{ record }">
-            <span>
-                {{ record.description }}
-            </span>
+            <div class="post-detail-wrap">
+                <div class="covers-wrap" v-if="record.covers.length">
+                    <ImagePreviewGroup>
+                        <Image :width="80" v-for="cover in record.covers" :src="cover"></Image>
+                    </ImagePreviewGroup>
+                </div>
+                <p>{{ record.description }}</p>
+            </div>
         </template>
         <template #bodyCell="{ column, record, text }">
+            <template v-if="column.dataIndex == 'covers'">
+                <div class="cover-wrap">
+                    <p class="Stereobox" v-if="text.length > 1">{{ text.length }}</p>
+                    <Image v-if="text.length" :width="80" :src="text[0]"></Image>
+                    <FileImageOutlined v-else />
+                </div>
+            </template>
             <template v-if="column.dataIndex == 'status'">
                 <Tag :color="text === 'Publish' ? 'green' : 'default'">{{ PostStatus[text as keyof typeof PostStatus] }}
                 </Tag>
@@ -102,8 +147,83 @@ const FetchTableData = async () => {
                 <Tag :color="text ? 'success' : 'default'">{{ text ? '已推荐' : '未推荐' }}
                 </Tag>
             </template>
+            <template v-if="column.dataIndex == 'operation'">
+                <Space>
+                    <Button size="small">修改</Button>
+                    <Button @click="handleDelPost(record as ResPost)" size="small" type="text" danger>删除</Button>
+                </Space>
+            </template>
         </template>
     </Table>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.ant-image) {
+    background-color: #eee;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    z-index: 2;
+    --Stereo-radius: 5px;
+    border-radius: var(--Stereo-radius);
+}
+
+:deep(.ant-image::before) {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    border-radius: calc(var(--Stereo-radius) - 1px);
+    border: 1px solid hsla(0, 0%, 100%, 0.22);
+    pointer-events: none;
+    mask-image: linear-gradient(0deg, transparent, #000);
+    -webkit-mask-image: linear-gradient(0deg, transparent, #000);
+    z-index: 1;
+}
+
+.cover-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-wrap>p {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 5;
+    height: 20px;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFF;
+    border-radius: 50%;
+    background-color: rgba(v-bind(ThemeColorRgb), 1);
+    font-size: 12px;
+}
+
+.cover-wrap>span {
+    background-color: #eee;
+    padding: 10px;
+    opacity: 0.5;
+}
+
+.post-detail-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.covers-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+</style>

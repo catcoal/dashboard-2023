@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import Layout from "@/layout/default.vue"
 import { ConfigProvider } from "ant-design-vue";
+import { ThemeColor } from "@/config/app";
 </script>
 
 <template>
-  <ConfigProvider :theme="{ token: { colorPrimary: '#00b96b' } }">
+  <ConfigProvider :theme="{ token: { colorPrimary: ThemeColor } }">
     <RouterView></RouterView>
-    <!-- <Layout></Layout> -->
   </ConfigProvider>
 </template>
 
-<style scoped></style>
+<style></style>

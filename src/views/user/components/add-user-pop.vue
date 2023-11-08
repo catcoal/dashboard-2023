@@ -43,9 +43,6 @@ const handleAddUser = () => {
     })
 }
 
-const resetForm = () => {
-
-}
 </script>
 
 <template>

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import DragImages from "@/components/DragImages/DragImages.vue";
-import Editor from "./components/editor.vue";
+import Editor, { backData } from "./components/editor.vue";
 import { pinyin } from "pinyin-pro"
 import { IPost, NewPost, PostStatus } from "@/api/post";
 import { FetchTagList, ITag } from "@/api/tag";
 import { FetchUserList, FetchMeInfo, IUser } from "@/api/user";
-import { FormItem, Input, Textarea, Select, SelectOption, Button, Switch, Row, Col as ColItem, Form, Space } from 'ant-design-vue';
+import { FormItem, Input, Textarea, Select, SelectOption, Button, Switch, Row, Col as ColItem, Form, Space, message } from 'ant-design-vue';
+import { Rule } from "ant-design-vue/es/form";
 import { onMounted, ref, computed } from "vue";
 
+const postFormRef = ref();
+const submitLoading = ref(false);
 const FormData = ref<IPost>({
     title: '',
     enTitle: '',
@@ -15,13 +18,17 @@ const FormData = ref<IPost>({
     content: '',
     authorId: 0,
     tagIds: [],
-    covers: '',
-    status: PostStatus['Draft'],
+    covers: [],
+    status: 'Private' as PostStatus.Private,
     isRecommend: false,
     isTop: false,
     commentEnabled: false
 });
-const covers = ref<string[]>([]);
+const rules: Record<string, Rule[]> = {
+    enTitle: [{ required: true, message: '请输入文章唯一标识', trigger: 'blur' }],
+    title: [{ required: true, message: '请输入文章标题', trigger: 'change' }],
+    description: [{ required: true, message: '请输入文章描述', trigger: 'change' }]
+};
 const adminList = ref<IUser[]>();
 const tagList = ref<ITag[]>();
 
@@ -31,42 +38,51 @@ onMounted(async () => {
     getAdmin();
     getTag();
 })
-
-const handleTitle = () => {
-    FormData.value.enTitle = (pinyin(FormData.value.title, { toneType: 'none', type: 'array' })).join('-');
-}
-
+// 中文转拼音
+const handleTitle = () => FormData.value.enTitle = (pinyin(FormData.value.title, { toneType: 'none', type: 'array' })).join('-');
 // 获取管理员
-const getAdmin = async () => {
-    try {
-        adminList.value = (await FetchUserList({
-            role: "Admin"
-        })).data
-    } catch (err: any) {
+const getAdmin = async () => { adminList.value = (await FetchUserList({ role: "Admin" })).data };
+// 获取标签
+const getTag = async () => { tagList.value = (await FetchTagList()).data };
 
+// 编辑器输出
+const handleEditorOutput = (payload: backData) => {
+    if (payload.type == 'image') {
+        FormData.value.covers?.push(payload.data.default)
     }
 }
 
-// 获取标签
-const getTag = async () => {
-    tagList.value = (await FetchTagList()).data;
+// 发布
+const Post = async () => {
+    postFormRef.value.validate().then(async () => {
+        submitLoading.value = true;
+        try {
+            await NewPost(FormData.value)
+            message.success('发文成功')
+        } catch (err: any) {
+            message.error(err || '网络错误')
+        } finally {
+            submitLoading.value = false;
+        }
+    }).catch(() => {
+        message.error("请检查表单")
+    })
 }
 
-const Post = () => {
-    FormData.value.covers = covers.value.join(',');
-    console.log(FormData.value)
-    // NewPost(FormData.value)
+// 发布草稿
+const PostDraft = () => {
+    FormData.value.status = 'Draft' as PostStatus.Draft;
 }
 
 </script>
 <template>
-    <Form :model="FormData">
+    <Form ref="postFormRef" :model="FormData" :rules="rules">
         <Row :wrap="false" :gutter="20">
             <col-item :md="{ span: 10 }" :lg="{ span: 8 }">
-                <FormItem label="唯一标识">
+                <FormItem label="唯一标识" name="enTitle">
                     <Textarea v-model:value="FormData.enTitle" autoSize></Textarea>
                 </FormItem>
-                <FormItem label="标题">
+                <FormItem label="标题" name="title">
                     <Textarea @input="handleTitle" v-model:value="FormData.title" autoSize></Textarea>
                 </FormItem>
                 <FormItem label="描述">
@@ -91,8 +107,8 @@ const Post = () => {
                 </FormItem>
                 <FormItem label="状态">
                     <Select v-model:value="FormData.status">
-                        <SelectOption v-for="statu in PostStatus" :key="statu" :value="statu">
-                            <p>{{ statu }}</p>
+                        <SelectOption v-for="(value, key) in PostStatus" :key="key" :value="key">
+                            <p>{{ value }}</p>
                         </SelectOption>
                     </Select>
                 </FormItem>
@@ -108,20 +124,20 @@ const Post = () => {
                     </FormItem>
                 </Space>
                 <FormItem label="封面">
-                    <DragImages :urls="covers" />
+                    <DragImages :urls="FormData.covers!" />
                 </FormItem>
             </col-item>
             <col-item :md="{ span: 14 }" :lg="{ span: 16 }">
                 <FormItem>
-                    <Editor></Editor>
-                    <!-- <Textarea v-model:value="FormData.content" autosize></Textarea> -->
+                    <Editor v-model="FormData.content" @output="handleEditorOutput"></Editor>
                 </FormItem>
             </col-item>
         </Row>
     </Form>
     <div class="post-footer-mask">
         <div class="post-footer">
-            <Button :type="'primary'" @click="Post">发布</Button>
+            <Button :loading="submitLoading" :type="'primary'" @click="Post">发布</Button>
+            <Button :loading="submitLoading" :type="'default'" @click="PostDraft">保存草稿</Button>
         </div>
     </div>
 </template>
@@ -164,6 +180,7 @@ const Post = () => {
     padding: 10px;
     display: flex;
     align-items: center;
+    gap: 10px;
     justify-content: flex-end;
     background-color: rgba(245, 245, 245, 0.5);
     border-top: 1px solid rgba(245, 245, 245, 0.9);

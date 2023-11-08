@@ -3,8 +3,9 @@ import Gravatar from "@/components/Gravatar/Gravatar.vue"
 import AddUserPop from './components/add-user-pop.vue';
 import { Table, TableColumnsType, TableProps, Tag, Button, message } from 'ant-design-vue';
 import { FetchUserList, IUser, DelUser } from "@/api/user";
-import { onMounted, ref } from 'vue';
+import { h, onMounted, ref } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
+import { ThemeColor } from "@/config/app";
 
 const showAddUserForm = ref(false);
 const columns: TableColumnsType = [
@@ -69,7 +70,15 @@ const AddUser = {
 const handleDelUser = (user: IUser) => {
     LemAntModal({
         title: "提示",
-        content: `确认删除${user.email}用户吗?`,
+        content: h('span', [
+            h('span', '确认删除 '),
+            h('b', {
+                style: {
+                    color: ThemeColor
+                }
+            }, user.email),
+            h('span', ' 用户吗?'),
+        ]),
         okType: 'danger',
         onOk: async () => {
             try {
