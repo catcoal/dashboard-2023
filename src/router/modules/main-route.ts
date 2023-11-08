@@ -52,6 +52,15 @@ export const MainRoutes: RouteRecordRaw[] = [
           label: "发布文章",
         },
       },
+      {
+        path: "/post_mange/post/:id",
+        name: "PostUpate",
+        component: () => import("@/views/post/post.vue"),
+        meta: {
+          label: "编辑文章",
+          menuHiden: true,
+        },
+      },
     ],
   },
   {

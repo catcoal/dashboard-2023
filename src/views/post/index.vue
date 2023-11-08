@@ -5,7 +5,9 @@ import { FileImageOutlined } from '@ant-design/icons-vue';
 import { DelPost, FetchPostList, IPost, PostStatus, ResPost } from "@/api/post";
 import { onMounted, ref, h } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const columns: TableColumnsType = [
     {
         title: "封面",
@@ -75,6 +77,11 @@ const FetchTableData = async () => {
     } finally {
         tableLoading.value = false;
     }
+}
+
+// 前往更新
+const toUpadte = (post: ResPost) => {
+    router.push('/post_mange/post/' + post.id)
 }
 
 // 删除文章
@@ -149,7 +156,7 @@ const handleDelPost = (post: ResPost) => {
             </template>
             <template v-if="column.dataIndex == 'operation'">
                 <Space>
-                    <Button size="small">修改</Button>
+                    <Button @click="toUpadte(record as ResPost)" size="small">修改</Button>
                     <Button @click="handleDelPost(record as ResPost)" size="small" type="text" danger>删除</Button>
                 </Space>
             </template>

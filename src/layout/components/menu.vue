@@ -20,7 +20,7 @@ onMounted(async () => {
 // 转路由
 function transformRoutes(routes: RouteRecordRaw[]): ItemType[] {
     return routes
-        .filter((route) => route.meta) // 存在meta则渲染
+        .filter((route) => !route.meta?.menuHiden) // 存在则渲染
         .map((route) => {
             const { name, meta, children, path } = route;
             const { icon, label } = meta!;

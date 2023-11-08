@@ -1,7 +1,8 @@
 <template>
     <div class="drag-container">
-        <div v-for="(item, index) in items" :key="index" class="drag-item Stereobox" @dragstart="startDrag(index, $event)"
+        <div v-for="(item, index) in urls" :key="index" class="drag-item Stereobox" @dragstart="startDrag(index, $event)"
             @dragover="dragOver(index, $event)" @dragend="endDrag" draggable>
+            <DeleteOutlined @click.stop="delImage(index)" class="del" />
             <span class="drag-line" :class="{ 'drag-line-highlight': showLine === index && showLineBefore }"></span>
             <div class="drag-item-inner">
                 <img :src="item" alt="" srcset="">
@@ -21,18 +22,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRef } from 'vue';
-import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue';
+import { ref, toRef, computed } from 'vue';
+import { PlusOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { UploadFile, ResFile } from "@/api/common";
 import { IResultData } from '@/utils/MyFetch';
 import { LemAntModal } from '@/utils/MyAnt';
 import { ThemeColorRgb } from '@/config/app';
 
-
 const props = defineProps<{ urls: string[] }>();
 const emit = defineEmits(['Success']);
 const isUploading = ref(false);
-const items = toRef(props.urls);
+const items = computed(() => props.urls);
 
 // 上传文件
 const uploadFile = async (e: Event) => {
@@ -46,8 +46,8 @@ const uploadFile = async (e: Event) => {
     });
     try {
         let res: IResultData<ResFile>[] = await Promise.all(uploadPromises);
-        items.value.push(...res.map(item => item.data!.fileUrl));
-        emit('Success', items);
+        props.urls.push(...res.map(item => item.data!.fileUrl));
+        emit('Success', props.urls);
     } catch (err: any) {
         LemAntModal({
             title: "错误",
@@ -56,6 +56,11 @@ const uploadFile = async (e: Event) => {
     } finally {
         isUploading.value = false;
     }
+}
+
+// 删除图片
+const delImage = (index: number) => {
+    props.urls.splice(index, 1);
 }
 
 // 拖拽排序
@@ -109,6 +114,17 @@ const endDrag = () => {
     padding-top: 100%;
     background-color: #eee;
     border-radius: 10px;
+}
+
+.del {
+    position: absolute;
+    z-index: 2;
+    color: #FFF;
+    padding: 5px;
+    border-radius: 50%;
+    top: 5px;
+    right: 5px;
+    background-color: tomato;
 }
 
 .upload-item {
