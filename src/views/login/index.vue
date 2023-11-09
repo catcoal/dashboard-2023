@@ -12,8 +12,8 @@ const route = useRoute();
 const authStore = useAuth();
 const authLoading = ref(false);
 const AuthForm = ref<IAuth>({
-    account: "1622455251@qq.com",
-    password: "Lemming069"
+    account: "",
+    password: ""
 });
 
 const Auth = async () => {

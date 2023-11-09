@@ -1,4 +1,9 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  createWebHashHistory,
+  RouteRecordRaw,
+  createWebHistory,
+} from "vue-router";
 import { MainRoutes } from "./modules/main-route";
 
 const routes: RouteRecordRaw[] = [
@@ -16,7 +21,10 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history:
+    import.meta.env.MODE === "development"
+      ? createWebHashHistory()
+      : createWebHistory(),
   routes,
 });
 
