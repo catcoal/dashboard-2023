@@ -50,7 +50,7 @@ onMounted(async () => {
     }
 })
 // 中文转拼音
-const handleTitle = () => FormData.value.enTitle = (pinyin(FormData.value.title, { toneType: 'none', type: 'array' })).join('-');
+const handleTitle = () => FormData.value.enTitle = (pinyin(FormData.value.title!, { toneType: 'none', type: 'array' })).join('-');
 // 获取管理员
 const getAdmin = async () => { adminList.value = (await FetchUserList({ role: "Admin" })).data };
 // 获取标签

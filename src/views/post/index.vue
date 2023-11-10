@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ThemeColor, ThemeColorRgb } from '@/config/app';
-import { Space, Table, TableColumnsType, TableProps, Tag, Image, ImagePreviewGroup, Button, message } from 'ant-design-vue';
+import { Space, Table, TableColumnsType, TableProps, Tag, Image, ImagePreviewGroup, Button, message, Switch } from 'ant-design-vue';
 import { FileImageOutlined } from '@ant-design/icons-vue';
-import { DelPost, FetchPostList, IPost, PostStatus, ResPost } from "@/api/post";
+import { DelPost, FetchPostList, IPost, PostStatus, ResPost, UpdatePost } from "@/api/post";
 import { onMounted, ref, h } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { useRouter } from 'vue-router';
@@ -45,6 +45,7 @@ const columns: TableColumnsType = [
     }
 ];
 
+const comLoading = ref(false);
 const tableData = ref<ResPost[]>();
 const tableLoading = ref(false);
 const pagination = ref({
@@ -63,6 +64,37 @@ const handleTableChange: TableProps['onChange'] = (pag, filters, sorter) => {
     FetchTableData();
 }
 
+// 切换状态
+const switchStatus = async (type: 'isTop' | 'commentEnabled' | 'isRecommend', data: ResPost) => {
+    comLoading.value = true;
+    try {
+        let updateData: {
+            [key: string]: any
+        } = {
+            id: data.id
+        };
+        updateData[type] = data[type];
+        await UpdatePost(updateData);
+    } finally {
+        comLoading.value = false;
+    }
+}
+
+// 切换文章发布状态
+const switchPostStatus = async (type: keyof typeof PostStatus, data: ResPost) => {
+    comLoading.value = true;
+    data.status = type as PostStatus;
+    try {
+        await UpdatePost({
+            id: data.id,
+            status: type as PostStatus
+        });
+    } finally {
+        comLoading.value = false;
+    }
+}
+
+// 获取数据
 const FetchTableData = async () => {
     try {
         const { data, meta } = await FetchPostList({
@@ -143,19 +175,23 @@ const handleDelPost = (post: ResPost) => {
                 <a :href="text" target="_blank">{{ text }}</a>
             </template>
             <template v-if="column.dataIndex == 'isTop'">
-                <Tag :color="text ? 'success' : 'default'">{{ text ? '已置顶' : '未置顶' }}
-                </Tag>
+                <Switch :loading="comLoading" @click="switchStatus('isTop', record as ResPost)"
+                    v-model:checked="record.isTop" checked-children="YES" un-checked-children="NO" />
             </template>
             <template v-if="column.dataIndex == 'commentEnabled'">
-                <Tag :color="text ? 'success' : 'default'">{{ text ? '已开启' : '未开启' }}
-                </Tag>
+                <Switch :loading="comLoading" @click="switchStatus('commentEnabled', record as ResPost)"
+                    v-model:checked="record.commentEnabled" checked-children="YES" un-checked-children="NO" />
             </template>
             <template v-if="column.dataIndex == 'isRecommend'">
-                <Tag :color="text ? 'success' : 'default'">{{ text ? '已推荐' : '未推荐' }}
-                </Tag>
+                <Switch :loading="comLoading" @click="switchStatus('isRecommend', record as ResPost)"
+                    v-model:checked="record.isRecommend" checked-children="YES" un-checked-children="NO" />
             </template>
             <template v-if="column.dataIndex == 'operation'">
                 <Space>
+                    <Button @click="switchPostStatus('Publish', record as ResPost)" v-if="record.status !== 'Publish'"
+                        type="primary" size="small">发布</Button>
+                    <Button @click="switchPostStatus('Draft', record as ResPost)" v-else type="dashed" danger
+                        size="small">下撤</Button>
                     <Button @click="toUpadte(record as ResPost)" size="small">修改</Button>
                     <Button @click="handleDelPost(record as ResPost)" size="small" type="text" danger>删除</Button>
                 </Space>

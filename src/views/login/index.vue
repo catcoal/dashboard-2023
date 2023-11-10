@@ -37,14 +37,14 @@ const Auth = async () => {
         <div class="auth-box Stereobox">
             <Form :model="AuthForm">
                 <FormItem>
-                    <Input v-model:value="AuthForm.account" placeholder="账户名">
+                    <Input @keydown.enter="Auth" v-model:value="AuthForm.account" placeholder="账户名">
                     <template #prefix>
                         <UserOutlined style="color: #d9d9d9" />
                     </template>
                     </Input>
                 </FormItem>
                 <FormItem>
-                    <InputPassword v-model:value="AuthForm.password" placeholder="密码">
+                    <InputPassword @keydown.enter="Auth" v-model:value="AuthForm.password" placeholder="密码">
                         <template #prefix>
                             <LockOutlined style="color: #d9d9d9" />
                         </template>

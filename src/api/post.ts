@@ -16,11 +16,11 @@ export enum PostType {
 
 export interface IPost {
   id?: number;
-  title: string;
-  enTitle: string;
-  description: string;
-  content: string;
-  authorId: number;
+  title?: string;
+  enTitle?: string;
+  description?: string;
+  content?: string;
+  authorId?: number;
   covers?: string[];
   weight?: number;
   status?: PostStatus;
@@ -31,6 +31,7 @@ export interface IPost {
 }
 
 export interface ResPost {
+  [key: string]: any;
   id: number;
   title: string;
   enTitle: string;
