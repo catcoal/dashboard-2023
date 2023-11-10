@@ -24,7 +24,7 @@ const router = createRouter({
   history:
     import.meta.env.MODE === "development"
       ? createWebHashHistory()
-      : createWebHistory(),
+      : createWebHistory("/"),
   routes,
 });
 
