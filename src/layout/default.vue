@@ -46,7 +46,7 @@ import Header from "@/layout/components/header.vue";
     z-index: 9;
     background-color: rgba(245, 245, 245, 0.5);
     border-bottom: 1px solid rgba(245, 245, 245, 0.9);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(25px) saturate(10);
     line-height: unset;
     height: auto;
     padding: 10px 20px;
