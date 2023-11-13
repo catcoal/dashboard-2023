@@ -21,7 +21,7 @@
 /* 立体盒子 */
 .Stereobox {
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   z-index: 2;
   --Stereo-radius: 10px;

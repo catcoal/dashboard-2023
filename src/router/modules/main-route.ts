@@ -72,4 +72,13 @@ export const MainRoutes: RouteRecordRaw[] = [
     },
     children: [],
   },
+  {
+    path: "/resource",
+    name: "Resource",
+    component: () => import("@/views/resource/index.vue"),
+    meta: {
+      label: "素材管理",
+    },
+    children: [],
+  },
 ];

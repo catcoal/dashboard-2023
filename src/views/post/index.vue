@@ -6,6 +6,7 @@ import { DelPost, FetchPostList, IPost, PostStatus, ResPost, UpdatePost } from "
 import { onMounted, ref, h } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { useRouter } from 'vue-router';
+import { OptimizeImageURL } from "@/utils/utils"
 
 const router = useRouter();
 const columns: TableColumnsType = [
@@ -153,7 +154,7 @@ const handleDelPost = (post: ResPost) => {
             <div class="post-detail-wrap">
                 <div class="covers-wrap" v-if="record.covers.length">
                     <ImagePreviewGroup>
-                        <Image :width="80" v-for="cover in record.covers" :src="cover"></Image>
+                        <Image :width="80" v-for="cover in record.covers" :src="OptimizeImageURL(cover, 20)"></Image>
                     </ImagePreviewGroup>
                 </div>
                 <p>{{ record.description }}</p>
@@ -163,7 +164,7 @@ const handleDelPost = (post: ResPost) => {
             <template v-if="column.dataIndex == 'covers'">
                 <div class="cover-wrap">
                     <p class="Stereobox" v-if="text.length > 1">{{ text.length }}</p>
-                    <Image v-if="text.length" :width="80" :src="text[0]"></Image>
+                    <Image v-if="text.length" :width="80" :src="OptimizeImageURL(text[0], 20)"></Image>
                     <FileImageOutlined v-else />
                 </div>
             </template>

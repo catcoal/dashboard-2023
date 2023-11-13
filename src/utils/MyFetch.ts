@@ -162,8 +162,8 @@ class LemFetch {
     return this.request(url, "PATCH", data);
   }
 
-  async delete(url: string) {
-    return this.request(url, "DELETE");
+  async delete(url: string, data?: any) {
+    return this.request(url, "DELETE", data);
   }
 }
 
