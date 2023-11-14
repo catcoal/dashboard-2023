@@ -1,18 +1,53 @@
 <script setup lang="ts">
 import ResourceItem from "./components/resource-item.vue"
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { UploadFile } from "@/api/common"
-import { FetchResources, Resource } from "@/api/resource"
+import { ConvertSize } from "@/utils/utils"
+import { FetchResources, Resource, FetchUsage } from "@/api/resource"
 import { ref } from 'vue';
-import { Upload, Button, UploadChangeParam, UploadProps } from 'ant-design-vue';
+import { Upload, Button, UploadChangeParam, UploadProps, Tag, Space, Spin } from 'ant-design-vue';
+import { useResource } from "@/stores/resource";
+import { CaretLeftOutlined } from "@ant-design/icons-vue";
 
+const resourceStore = useResource();
 const resources = ref<Resource[]>([]);
+const resourceLoading = ref<boolean>(false);
+const folderSize = ref<string>('0KB');
 const uploadFileList = ref<UploadProps['fileList']>();
-const currentFolder = ref<string>('/blog');
+const currentFolder = computed(() => resourceStore.currentPath.join('') || '/');
 
-onMounted(async () => {
-    resources.value = (await FetchResources({ remotePath: currentFolder.value })).data!;
+onMounted(() => {
+    getUsage();
+    getResources();
 })
+
+const getUsage = async () => {
+    folderSize.value = ConvertSize((await FetchUsage(currentFolder.value)).data);
+}
+
+const getResources = async () => {
+    resourceLoading.value = true;
+    resources.value = (await FetchResources({ remotePath: currentFolder.value })).data!;
+    resourceLoading.value = false;
+}
+
+// 打开文件夹
+const openFolder = (resource: Resource) => {
+    if (resource.type === 'F') {
+        resourceStore.push(resource.name);
+        getUsage();
+        getResources();
+    }
+}
+
+// 返回上一个目录
+const backLastFolder = () => {
+    resources.value = [];
+    resourceStore.back().then(() => {
+        getUsage();
+        getResources();
+    })
+}
 
 // 上传资源
 const uploadResource = async (e: UploadChangeParam) => {
@@ -44,21 +79,39 @@ const uploadResource = async (e: UploadChangeParam) => {
     <div class="header-wrap">
         <Upload name="file" v-model:file-list="uploadFileList" @change="uploadResource" multiple
             :beforeUpload="() => { return false }" :listType="'picture'">
-            <Button type="primary">
-                上传素材
-            </Button>
+            <Space>
+                <Button type="primary">
+                    上传素材
+                </Button>
+                <Tag @click.stop color="orange">
+                    <span style="cursor: pointer;" @click="backLastFolder" v-show="resourceStore.hasBack">
+                        <CaretLeftOutlined />
+                    </span>
+                    {{ currentFolder }}
+                </Tag>
+            </Space>
         </Upload>
+        <Tag color="volcano">
+            <a href="https://www.upyun.com/" target="_blank">upyun服务</a>
+            <span>已使用:{{ folderSize }}</span>
+        </Tag>
     </div>
     <div class="resource-container">
-        <div class="resource-list">
-            <ResourceItem :resource="item" v-for="item in resources"></ResourceItem>
-        </div>
+        <Spin :spinning="resourceLoading">
+            <div class="resource-list">
+                <ResourceItem @dblclick="openFolder(item)" :resource="item" v-for="item in resources"></ResourceItem>
+            </div>
+        </Spin>
     </div>
 </template>
 
 <style scoped>
 .header-wrap {
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
 }
 
 .resource-container {

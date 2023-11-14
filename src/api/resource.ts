@@ -23,3 +23,8 @@ export const FetchResources = (
 export const DeleteResource = (remotePath: string) => {
   return LemFetch.delete("/resource", { remotePath });
 };
+
+// 获取目录大小
+export const FetchUsage = (remotePath: string) => {
+  return LemFetch.get("/resource/size", { remotePath });
+};

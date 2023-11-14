@@ -2,15 +2,19 @@
 import { Layout, LayoutSider, LayoutHeader, LayoutContent, Button } from 'ant-design-vue';
 import Menu from "@/layout/components/menu.vue";
 import Header from "@/layout/components/header.vue";
+import { useApp } from '@/stores/app';
+import { computed } from 'vue';
+const appStore = useApp();
+const menuCollapsed = computed(() => appStore.menuCollapsed);
 
 </script>
 
 <template>
     <Layout class="default-layout">
-        <LayoutSider class="layout-sider">
+        <LayoutSider class="layout-sider" :collapsed="menuCollapsed" :collapsedWidth="0" :trigger="null" collapsible>
             <Menu></Menu>
         </LayoutSider>
-        <Layout class="layout-inner">
+        <Layout class="layout-inner" :class="{ 'Collapsed': menuCollapsed }">
             <LayoutHeader class="layout-header">
                 <Header></Header>
             </LayoutHeader>
@@ -28,16 +32,24 @@ import Header from "@/layout/components/header.vue";
 
 .layout-inner {
     margin-left: 200px;
+    transition: .3s ease;
+    transition-property: margin-left;
+}
+
+.layout-inner.Collapsed {
+    margin-left: 0;
 }
 
 .layout-sider {
     user-select: none;
     position: fixed;
+    z-index: 99;
     left: 0;
     bottom: 0;
     top: 0;
     overflow: auto;
-    background-color: #FFF;
+    background-color: transparent;
+    padding: 10px 0 10px 10px;
 }
 
 .layout-header {
@@ -55,5 +67,15 @@ import Header from "@/layout/components/header.vue";
 .layout-content {
     padding: 10px 20px 20px 20px;
     background-color: transparent;
+}
+
+@media (max-width:768px) {
+    .layout-sider {
+        top: 40px;
+    }
+
+    .layout-inner {
+        margin-left: 0;
+    }
 }
 </style>

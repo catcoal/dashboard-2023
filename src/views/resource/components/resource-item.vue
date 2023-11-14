@@ -1,19 +1,41 @@
 <script setup lang="ts">
+import FolderIcon from "@/assets/icons/folder.svg"
 import { Resource, DeleteResource } from '@/api/resource';
 import { ref, computed, h } from 'vue';
 import { OptimizeImageURL, ConvertSize } from "@/utils/utils"
 import { ThemeColor } from '@/config/app';
 import { ParseTime } from "@/utils/date";
-import { DeleteOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, LinkOutlined } from '@ant-design/icons-vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { message } from 'ant-design-vue';
+import useClipboard from "vue-clipboard3";
+import { useResource } from "@/stores/resource";
 
+
+const resourceStore = useResource();
+const { toClipboard } = useClipboard();
 const props = defineProps<{
     resource: Resource
 }>()
-const currentFolder = ref<string>('/blog');
+const currentFolder = computed(() => resourceStore.currentPath.join(''));
 const domain = import.meta.env.VITE_APP_RESOURCE_DOMAIN;
-const imageUrl = computed(() => props.resource.url || OptimizeImageURL(domain + currentFolder.value + '/' + props.resource.name, 20));
+const imageUrl = computed(() => {
+    if (props.resource.type === 'N') {
+        return props.resource.url || OptimizeImageURL(domain + currentFolder.value + '/' + props.resource.name, 20)
+    } else {
+        return FolderIcon;
+    }
+});
+
+// 复制地址
+const copyUrl = async () => {
+    try {
+        await toClipboard(props.resource.url || domain + currentFolder.value + '/' + props.resource.name);
+        message.success('已复制地址到剪贴板')
+    } catch (err: any) {
+        message.error('复制失败')
+    }
+}
 
 // 删除资源
 const delResource = () => {
@@ -78,10 +100,15 @@ const delResource = () => {
                 <img :src="imageUrl" :alt="resource.name" srcset="">
             </div>
             <div class="cover-mask">
-                <p @click="delResource" class="del btn-active Stereobox">
-                    <DeleteOutlined />
-                </p>
-                <p class="size Stereobox">{{ ConvertSize(resource.size) }}</p>
+                <div class="resource-control">
+                    <span @click="copyUrl" class="copy btn-active Stereobox">
+                        <LinkOutlined />
+                    </span>
+                    <span @click="delResource" v-if="resource.type === 'N'" class="del btn-active Stereobox">
+                        <DeleteOutlined />
+                    </span>
+                </div>
+                <p class="size Stereobox">{{ resource.type === 'N' ? ConvertSize(resource.size) : '文件夹' }}</p>
             </div>
         </div>
         <div class="resource-infos">
@@ -142,20 +169,34 @@ const delResource = () => {
     opacity: 1;
 }
 
-.cover-mask>.del {
-    cursor: pointer;
+.resource-control {
     position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.resource-control>span {
+    cursor: pointer;
     width: 25px;
     height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 5px;
-    right: 5px;
-    color: #FFF;
-    background-color: tomato;
     border-radius: 50%;
     --Stereo-radius: 50%;
+}
+
+.resource-control>.copy {
+    background-color: #eee;
+    color: #000;
+}
+
+.resource-control>.del {
+    background-color: tomato;
 }
 
 .cover-mask>.size {

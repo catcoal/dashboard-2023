@@ -50,7 +50,20 @@ const handleClick: MenuProps["onClick"] = (e) => {
 </script>
 
 <template>
-    <Menu :selected-keys="selectedMenuKeys" :items="items" mode="inline" @click="handleClick"></Menu>
+    <div class="menu-wrap Stereobox">
+        <Menu :selected-keys="selectedMenuKeys" :items="items" mode="inline" @click="handleClick"></Menu>
+    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.ant-menu {
+    border-inline-end: none !important;
+}
+
+.menu-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 0;
+    background-color: #FFF;
+}
+</style>

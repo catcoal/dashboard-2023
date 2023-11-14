@@ -11,6 +11,14 @@ export const OptimizeImageURL = (url: string, size: number) => {
   }
 };
 
+// 是否为移动端
+export const isMobile = (): boolean => {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+    userAgent
+  );
+};
+
 // 大小转换函数
 export const ConvertSize = (bytes: number): string => {
   const units = ["Bytes", "KB", "MB", "GB", "TB"];

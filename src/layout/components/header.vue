@@ -2,16 +2,25 @@
 import { useMe } from '@/stores/me';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { LogoutOutlined } from '@ant-design/icons-vue';
+import { Space } from 'ant-design-vue';
+import { LogoutOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { useAuth } from '@/stores/auth';
+import { ThemeColor } from '@/config/app';
 import { h } from 'vue';
+import { useApp } from '@/stores/app';
 
+const appStore = useApp();
 const meStore = useMe();
 const authStore = useAuth();
 const router = useRouter();
 const pageName = computed(() => router.currentRoute.value.meta.label || '');
 const userInfo = computed(() => meStore.MineInfo);
+const menuCollapsed = computed(() => appStore.menuCollapsed);
+
+const switchMenuVisable = () => {
+    appStore.switchCollapsed();
+}
 
 const signout = () => {
     LemAntModal({
@@ -36,7 +45,14 @@ const signout = () => {
 
 <template>
     <div class="header-inner">
-        <p class="header-plane">{{ pageName }}</p>
+        <Space>
+            <p @click="switchMenuVisable" class="header-plane menu-expand Stereobox"
+                :class="{ 'Collapsed': menuCollapsed }">
+                <MenuUnfoldOutlined v-show="menuCollapsed" />
+                <MenuFoldOutlined v-show="!menuCollapsed" />
+            </p>
+            <p class="header-plane">{{ pageName }}</p>
+        </Space>
         <div class="header-plane">
             <p>{{ userInfo?.email }}</p>
             <LogoutOutlined @click="signout" class="logout-btn Stereobox" />
@@ -61,6 +77,24 @@ const signout = () => {
     display: flex;
     align-items: center;
     gap: 10px;
+    height: 30px;
+}
+
+.menu-expand {
+    cursor: pointer;
+    background-color: v-bind(ThemeColor);
+    color: #FFF;
+    transition: .3s ease;
+    transition-property: transform;
+}
+
+.menu-expand.Collapsed {
+    background-color: #FFF;
+    color: #000;
+}
+
+.menu-expand:active {
+    transform: scale(0.95);
 }
 
 .logout-btn {
