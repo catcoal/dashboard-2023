@@ -99,4 +99,10 @@ const handleDel = (item: ITag, index: number) => {
     flex-wrap: wrap;
     gap: 10px 0;
 }
+
+.ant-tag {
+    font-size: 16px;
+    line-height: 30px;
+    padding: 0 10px;
+}
 </style>

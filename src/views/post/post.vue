@@ -255,5 +255,6 @@ const SubmitDraft = () => {
     background-color: rgba(245, 245, 245, 0.5);
     border-top: 1px solid rgba(245, 245, 245, 0.9);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 </style>

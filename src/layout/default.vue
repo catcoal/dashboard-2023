@@ -59,6 +59,7 @@ const menuCollapsed = computed(() => appStore.menuCollapsed);
     background-color: rgba(245, 245, 245, 0.5);
     border-bottom: 1px solid rgba(245, 245, 245, 0.9);
     backdrop-filter: blur(25px) saturate(10);
+    -webkit-backdrop-filter: blur(25px) saturate(10);
     line-height: unset;
     height: auto;
     padding: 10px 20px;

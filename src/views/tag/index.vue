@@ -15,7 +15,7 @@ onMounted(async () => {
 
 <template>
     <div class="tag-container">
-        <TagPart type="Category" label="分类" :data="Category!"></TagPart>
+        <!-- <TagPart type="Category" label="分类" :data="Category!"></TagPart> -->
         <TagPart type="ArticleTag" label="标签" :data="ArticleTag!"></TagPart>
     </div>
 </template>
@@ -23,7 +23,7 @@ onMounted(async () => {
 <style scoped>
 .tag-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 </style>

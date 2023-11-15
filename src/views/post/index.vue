@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ThemeColor, ThemeColorRgb } from '@/config/app';
 import { Space, Table, TableColumnsType, TableProps, Tag, Image, ImagePreviewGroup, Button, message, Switch } from 'ant-design-vue';
-import { FileImageOutlined } from '@ant-design/icons-vue';
+import { FileImageOutlined, MessageOutlined, TeamOutlined } from '@ant-design/icons-vue';
 import { DelPost, FetchPostList, IPost, PostStatus, ResPost, UpdatePost } from "@/api/post";
 import { onMounted, ref, h } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
@@ -16,33 +16,46 @@ const columns: TableColumnsType = [
         width: 80
     },
     {
+        title: "数据",
+        dataIndex: "otherInfo",
+        width: 80,
+        ellipsis: true
+    },
+    {
         title: "ID",
         dataIndex: "id",
+        width: 80,
     },
     {
         title: "状态",
         dataIndex: "status",
+        width: 80
     },
     {
         title: "标题",
         dataIndex: "title",
+        ellipsis: true
     },
     {
         title: "置顶?",
         dataIndex: "isTop",
+        width: 80,
     },
     {
         title: "评论?",
         dataIndex: "commentEnabled",
+        width: 80,
     },
     {
         title: "推荐?",
-        dataIndex: "isRecommend"
+        dataIndex: "isRecommend",
+        width: 80,
     },
     {
         title: "操作",
         dataIndex: "operation",
         fixed: 'right',
+        width: 100,
     }
 ];
 
@@ -147,9 +160,7 @@ const handleDelPost = (post: ResPost) => {
 <template>
     <Table :loading="tableLoading" :scroll="{ x: true }" :row-key="record => record.id" :columns="columns"
         :pagination="pagination" :data-source="tableData" @change="handleTableChange" :expand-column-width="60">
-        <template #expandColumnTitle>
-            更多
-        </template>
+        <template #expandColumnTitle></template>
         <template #expandedRowRender="{ record }">
             <div class="post-detail-wrap">
                 <div class="covers-wrap" v-if="record.covers.length">
@@ -167,6 +178,22 @@ const handleDelPost = (post: ResPost) => {
                     <Image v-if="text.length" :width="80" :src="OptimizeImageURL(text[0], 20)"></Image>
                     <FileImageOutlined v-else />
                 </div>
+            </template>
+            <template v-if="column.dataIndex == 'otherInfo'">
+                <Space :direction="'vertical'">
+                    <Tag>
+                        <template #icon>
+                            <TeamOutlined />
+                        </template>
+                        {{ record.viewCount }}
+                    </Tag>
+                    <Tag>
+                        <template #icon>
+                            <MessageOutlined />
+                        </template>
+                        {{ record.commentCount }}
+                    </Tag>
+                </Space>
             </template>
             <template v-if="column.dataIndex == 'status'">
                 <Tag :color="text === 'Publish' ? 'green' : 'default'">{{ PostStatus[text as keyof typeof PostStatus] }}
