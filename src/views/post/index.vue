@@ -179,6 +179,9 @@ const handleDelPost = (post: ResPost) => {
                     <FileImageOutlined v-else />
                 </div>
             </template>
+            <template v-if="column.dataIndex == 'title'">
+                <a target="_blank" :href="'https://lemming.top/article/' + record.enTitle">{{ text }}</a>
+            </template>
             <template v-if="column.dataIndex == 'otherInfo'">
                 <Space :direction="'vertical'">
                     <Tag>

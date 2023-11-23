@@ -6,10 +6,11 @@ export interface ResFile {
 }
 
 export const UploadFile = (data: {
+  name: string;
   file: File;
 }): Promise<IResultData<ResFile>> => {
   return LemFetch.uploadFile("/upload/file", {
     file: data.file,
-    name: data.file.name,
+    name: data.name,
   });
 };

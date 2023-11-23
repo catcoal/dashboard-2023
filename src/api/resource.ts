@@ -19,6 +19,11 @@ export const FetchResources = (
   return LemFetch.get("/resources", query);
 };
 
+// 创建文件夹
+export const CreateFolder = (remotePath: string) => {
+  return LemFetch.post("/dir", { remotePath });
+};
+
 // 删除素材
 export const DeleteResource = (remotePath: string) => {
   return LemFetch.delete("/resource", { remotePath });

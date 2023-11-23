@@ -3,18 +3,29 @@ import ResourceItem from "./components/resource-item.vue"
 import { onMounted, computed } from 'vue';
 import { UploadFile } from "@/api/common"
 import { ConvertSize } from "@/utils/utils"
-import { FetchResources, Resource, FetchUsage } from "@/api/resource"
-import { ref } from 'vue';
-import { Upload, Button, UploadChangeParam, UploadProps, Tag, Space, Spin } from 'ant-design-vue';
+import { FetchResources, Resource, FetchUsage, CreateFolder } from "@/api/resource"
+import { ref, h } from 'vue';
+import { Upload, Button, UploadChangeParam, UploadProps, Tag, Space, Spin, Modal, Input, message } from 'ant-design-vue';
 import { useResource } from "@/stores/resource";
-import { CaretLeftOutlined } from "@ant-design/icons-vue";
+import { CaretLeftOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 
 const resourceStore = useResource();
 const resources = ref<Resource[]>([]);
 const resourceLoading = ref<boolean>(false);
+const resourceIndicator = h(LoadingOutlined, {
+    style: {
+        fontSize: '24px'
+    },
+    spin: true,
+});
+const domain = computed(() => import.meta.env.VITE_APP_RESOURCE_DOMAIN);
+const resourceSizeLoading = ref<boolean>(false);
 const folderSize = ref<string>('0KB');
 const uploadFileList = ref<UploadProps['fileList']>();
 const currentFolder = computed(() => resourceStore.currentPath.join('') || '/');
+const currentPath = computed(() => domain.value + currentFolder.value + '/');
+const createFolderVisible = ref<boolean>(false);
+const newFolderName = ref<string>('');
 
 onMounted(() => {
     getUsage();
@@ -22,7 +33,9 @@ onMounted(() => {
 })
 
 const getUsage = async () => {
+    resourceSizeLoading.value = true;
     folderSize.value = ConvertSize((await FetchUsage(currentFolder.value)).data);
+    resourceSizeLoading.value = false;
 }
 
 const getResources = async () => {
@@ -33,11 +46,17 @@ const getResources = async () => {
 
 // 打开文件夹
 const openFolder = (resource: Resource) => {
-    if (resource.type === 'F') {
-        resourceStore.push(resource.name);
-        getUsage();
-        getResources();
-    }
+    if (resource.type === 'N') return;
+    resources.value = [];
+    resourceStore.push(resource.name);
+    getUsage();
+    getResources();
+}
+
+// 选择文件
+const select = (resource: Resource) => {
+    if (resource.type === 'F') return
+    resourceStore.selectFile(currentPath.value + resource.name);
 }
 
 // 返回上一个目录
@@ -49,14 +68,24 @@ const backLastFolder = () => {
     })
 }
 
+// 创建文件夹
+const createFolder = async () => {
+    await CreateFolder(currentFolder.value === '/' ? newFolderName.value : currentFolder.value + "/" + newFolderName.value);
+    message.success('创建成功');
+    createFolderVisible.value = false;
+    await getResources();
+}
+
 // 上传资源
 const uploadResource = async (e: UploadChangeParam) => {
     let { name, size, lastModified } = e.file;
     let file = uploadFileList.value?.filter(file => file.name == name)[0];
     if (file) {
         try {
-            file.status = 'uploading';
-            let res = await UploadFile({ file: e.file as unknown as File });
+            let res = await UploadFile({
+                name: currentFolder.value + '/' + file.name,
+                file: e.file as unknown as File
+            });
             // 上传完成
             resources.value.push({
                 name,
@@ -83,6 +112,9 @@ const uploadResource = async (e: UploadChangeParam) => {
                 <Button type="primary">
                     上传素材
                 </Button>
+                <Button @click.stop="createFolderVisible = true" type="primary">
+                    新建文件夹
+                </Button>
                 <Tag @click.stop color="orange">
                     <span style="cursor: pointer;" @click="backLastFolder" v-show="resourceStore.hasBack">
                         <CaretLeftOutlined />
@@ -93,17 +125,28 @@ const uploadResource = async (e: UploadChangeParam) => {
         </Upload>
         <Tag color="volcano">
             <a href="https://www.upyun.com/" target="_blank">upyun服务</a>
-            <span>已使用:{{ folderSize }}</span>
+            <span>已使用:
+                {{ folderSize }}
+                <LoadingOutlined v-show="resourceSizeLoading" />
+            </span>
         </Tag>
     </div>
-    <div class="resource-container">
-        <Spin :spinning="resourceLoading">
-            <div class="resource-list">
-                <ResourceItem @dblclick="openFolder(item)" :resource="item" v-for="item in resources"></ResourceItem>
-            </div>
-        </Spin>
-    </div>
+    <Spin :indicator="resourceIndicator" wrapperClassName="resource-container" :spinning="resourceLoading">
+        <div class="resource-list">
+            <ResourceItem @click="select(item)" @dblclick="openFolder(item)" :resource="item" :select-quality="50"
+                v-for="item in resources"></ResourceItem>
+        </div>
+    </Spin>
+    <Modal v-model:open="createFolderVisible" @ok="createFolder" title="新增文件夹" ok-text="新增" cancel-text="取消" width="400px">
+        <Input v-model:value="newFolderName" placeholder="文件夹名称" />
+    </Modal>
 </template>
+
+<style>
+.ant-modal-confirm-content {
+    width: 100%;
+}
+</style>
 
 <style scoped>
 .header-wrap {
@@ -115,7 +158,8 @@ const uploadResource = async (e: UploadChangeParam) => {
 }
 
 .resource-container {
-    padding-bottom: 100px;
+    padding-bottom: 50px;
+    min-height: 200px;
 }
 
 .resource-list {

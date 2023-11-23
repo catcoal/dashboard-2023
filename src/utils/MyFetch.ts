@@ -1,4 +1,4 @@
-import Token from "@/utils/auth";
+import { Token, CreateTimestamp } from "@/utils/auth";
 import { LemAntModal } from "@/utils/MyAnt";
 import router from "@/router";
 import { useAuth } from "@/stores/auth";
@@ -65,9 +65,8 @@ class LemFetch {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          Ts: CreateTimestamp(),
           Authorization: Token.get() || "",
-          // Authorization:
-          //   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYXV0aG9yIjoiTGVtbWluZyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5ODk3NzU1MSwiZXhwIjoxNjk5MDIwNzUxfQ._fQSTeBbL0VGIOUZ1sCfIFy1FG8ulye5-tOh9zSaitI",
         },
         body: JSON.stringify(data),
       });

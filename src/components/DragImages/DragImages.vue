@@ -5,12 +5,12 @@
             <DeleteOutlined @click.stop="delImage(index)" class="del" />
             <span class="drag-line" :class="{ 'drag-line-highlight': showLine === index && showLineBefore }"></span>
             <div class="drag-item-inner">
-                <img :src="item" alt="" srcset="">
+                <img :src="OptimizeImageURL(item, 20)" alt="" srcset="">
             </div>
             <span class="drag-line" :class="{ 'drag-line-highlight': showLine === index && !showLineBefore }"></span>
         </div>
-        <div class="upload-item">
-            <input @change="uploadFile" multiple type="file" />
+        <div class="upload-item" @click.stop="selectFile">
+            <!-- <input @change="uploadFile" multiple type="file" /> -->
             <LoadingOutlined v-if="isUploading"></LoadingOutlined>
             <PlusOutlined v-else></PlusOutlined>
             <div class="ant-upload-text">
@@ -22,17 +22,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRef, computed } from 'vue';
+import { ref, toRef, computed, h, watch } from 'vue';
 import { PlusOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { UploadFile, ResFile } from "@/api/common";
 import { IResultData } from '@/utils/MyFetch';
 import { LemAntModal } from '@/utils/MyAnt';
 import { ThemeColorRgb } from '@/config/app';
+import Resource from "@/views/resource/index.vue"
+import { useResource } from '@/stores/resource';
+import { OptimizeImageURL } from '@/utils/utils';
 
+const resourceStore = useResource()
 const props = defineProps<{ urls: string[] }>();
 const emit = defineEmits(['Success']);
 const isUploading = ref(false);
 const items = computed(() => props.urls);
+const selectedFiles = computed(() => resourceStore.selectedFiles);
+let selectPopInstance = ref();
+
+// 选择文件
+const selectFile = () => {
+    selectPopInstance.value = LemAntModal({
+        icon: null,
+        width: '800px',
+        content: h(Resource),
+        okText: `选择(${selectedFiles.value.size})`,
+        onOk: () => {
+            // let zipUrls = Array.from(selectedFiles.value).map(url => OptimizeImageURL(url as string, 20))
+            props.urls.push(...Array.from(selectedFiles.value) as string[]);
+            resourceStore.clearSelect();
+        }
+    });
+}
+
+watch(() => selectedFiles.value, (value) => {
+    selectPopInstance.value.update({
+        okText: `选择(${selectedFiles.value.size})`
+    })
+}, { deep: true })
 
 // 上传文件
 const uploadFile = async (e: Event) => {
@@ -42,7 +69,7 @@ const uploadFile = async (e: Event) => {
     isUploading.value = true;
     const uploadPromises: any[] = [];
     Array.from(fileList).forEach(file => {
-        uploadPromises.push(UploadFile({ file }));
+        uploadPromises.push(UploadFile({ name: '', file }));
     });
     try {
         let res: IResultData<ResFile>[] = await Promise.all(uploadPromises);

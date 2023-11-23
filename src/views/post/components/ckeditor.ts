@@ -4,6 +4,7 @@ import {
   FileLoader,
 } from "@ckeditor/ckeditor5-upload/src/filerepository";
 import { UploadFile } from "@/api/common";
+import { ParseTime } from "@/utils/date";
 
 // 自定义上传
 export function customUploadImage(editor: Editor) {
@@ -25,7 +26,9 @@ class UploadAdapter {
     try {
       let file = await this.loader.file;
       if (file) {
-        let res = (await UploadFile({ file })).data;
+        const date = new Date();
+        const name = "blog/" + ParseTime(date, "{y}/{m}/{d}") + "/" + file.name;
+        let res = (await UploadFile({ name, file })).data;
         return Promise.resolve({
           default: res?.fileUrl,
           // '160': 'http://example.com/images/image–size-160.image.png',

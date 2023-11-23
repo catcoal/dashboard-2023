@@ -3,9 +3,9 @@ import FolderIcon from "@/assets/icons/folder.svg"
 import { Resource, DeleteResource } from '@/api/resource';
 import { ref, computed, h } from 'vue';
 import { OptimizeImageURL, ConvertSize } from "@/utils/utils"
-import { ThemeColor } from '@/config/app';
+import { ThemeColor, ThemeColorRgb } from '@/config/app';
 import { ParseTime } from "@/utils/date";
-import { DeleteOutlined, LinkOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, LinkOutlined, CheckOutlined } from '@ant-design/icons-vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { message } from 'ant-design-vue';
 import useClipboard from "vue-clipboard3";
@@ -14,23 +14,31 @@ import { useResource } from "@/stores/resource";
 
 const resourceStore = useResource();
 const { toClipboard } = useClipboard();
-const props = defineProps<{
-    resource: Resource
-}>()
+const props = withDefaults(defineProps<{
+    resource: Resource,
+    selectQuality: number
+}>(), {
+    // 默认值
+    selectQuality: 50
+});
+
 const currentFolder = computed(() => resourceStore.currentPath.join(''));
 const domain = import.meta.env.VITE_APP_RESOURCE_DOMAIN;
-const imageUrl = computed(() => {
+const coverUrl = computed(() => {
     if (props.resource.type === 'N') {
         return props.resource.url || OptimizeImageURL(domain + currentFolder.value + '/' + props.resource.name, 20)
     } else {
         return FolderIcon;
     }
 });
+const originUrl = computed(() => props.resource.url || domain + currentFolder.value + '/' + props.resource.name);
+const selectedFiles = computed(() => resourceStore.selectedFiles);
+const isSelected = computed(() => selectedFiles.value.has(originUrl.value));
 
 // 复制地址
 const copyUrl = async () => {
     try {
-        await toClipboard(props.resource.url || domain + currentFolder.value + '/' + props.resource.name);
+        await toClipboard(originUrl.value!);
         message.success('已复制地址到剪贴板')
     } catch (err: any) {
         message.error('复制失败')
@@ -94,17 +102,20 @@ const delResource = () => {
 </script>
 
 <template>
-    <div class="resource-wrap" :title="resource.name">
+    <div class="resource-wrap" :title="resource.name" :class="{ 'selected': isSelected }">
         <div class="resource-cover">
             <div class="image-cover">
-                <img :src="imageUrl" :alt="resource.name" srcset="">
+                <img :src="coverUrl" :alt="resource.name" srcset="">
             </div>
             <div class="cover-mask">
+                <span class="selected-icon Stereobox" v-show="isSelected">
+                    <CheckOutlined />
+                </span>
                 <div class="resource-control">
-                    <span @click="copyUrl" class="copy btn-active Stereobox">
+                    <span @click.stop="copyUrl" class="copy btn-active Stereobox">
                         <LinkOutlined />
                     </span>
-                    <span @click="delResource" v-if="resource.type === 'N'" class="del btn-active Stereobox">
+                    <span @click.stop="delResource" class="del btn-active Stereobox">
                         <DeleteOutlined />
                     </span>
                 </div>
@@ -113,7 +124,7 @@ const delResource = () => {
         </div>
         <div class="resource-infos">
             <p>{{ resource.name }}</p>
-            <span>{{ ParseTime(resource.time * 1000) }}</span>
+            <span>{{ ParseTime(resource.time * 1000, '{y}-{m}-{d} {h}:{i}') }}</span>
         </div>
     </div>
 </template>
@@ -124,6 +135,10 @@ const delResource = () => {
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+.resource-wrap.selected .image-cover>img {
+    box-shadow: 0 0 0 2px rgba(v-bind(ThemeColorRgb + ',0.8'));
 }
 
 .resource-cover {
@@ -145,6 +160,7 @@ const delResource = () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 10px;
 }
 
 .image-cover>img {
@@ -152,7 +168,7 @@ const delResource = () => {
     max-height: 100%;
     object-fit: contain;
     display: block;
-    border-radius: 10px;
+    border-radius: inherit;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
@@ -167,6 +183,22 @@ const delResource = () => {
 
 .resource-wrap:hover .btn-active {
     opacity: 1;
+}
+
+.selected-icon {
+    position: absolute;
+    background-color: v-bind(ThemeColor);
+    color: #FFF;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+    top: 7px;
+    left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
 }
 
 .resource-control {
@@ -203,12 +235,13 @@ const delResource = () => {
     position: absolute;
     right: 5px;
     bottom: 5px;
-    font-size: 12px;
+    font-size: 10px;
     background-color: v-bind(ThemeColor);
     color: #FFF;
     padding: 2px 5px;
     border-radius: 5px;
     --Stereo-radius: 5px;
+    opacity: 0.95;
 }
 
 .btn-active {

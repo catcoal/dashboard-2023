@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Token from '@/utils/auth';
 import { Form, FormItem, Input, InputPassword, Button, message } from 'ant-design-vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { ref } from 'vue';
