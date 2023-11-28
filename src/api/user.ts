@@ -20,6 +20,10 @@ export interface IUser {
   email: string;
   id: number;
   role: UserRole;
+  _count: {
+    posts: number;
+    comments: number;
+  };
 }
 
 export interface NewUser {

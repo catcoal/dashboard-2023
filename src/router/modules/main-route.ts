@@ -29,6 +29,23 @@ export const MainRoutes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/comment",
+    name: "comment",
+    meta: {
+      label: "评论管理",
+    },
+    children: [
+      {
+        path: "/comment/list",
+        name: "CommentList",
+        component: () => import("@/views/comment/index.vue"),
+        meta: {
+          label: "评论列表",
+        },
+      },
+    ],
+  },
+  {
     path: "/post_mange",
     name: "Post_mange",
     redirect: "/post_mange/list",

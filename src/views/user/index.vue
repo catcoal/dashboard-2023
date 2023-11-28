@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import Gravatar from "@/components/Gravatar/Gravatar.vue"
 import AddUserPop from './components/add-user-pop.vue';
-import { Table, TableColumnsType, TableProps, Tag, Button, message } from 'ant-design-vue';
+import { FileTextOutlined, MessageOutlined } from "@ant-design/icons-vue"
+import { Table, TableColumnsType, TableProps, Tag, Space, Button, message } from 'ant-design-vue';
 import { FetchUserList, IUser, DelUser } from "@/api/user";
 import { h, onMounted, ref } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
@@ -16,6 +17,10 @@ const columns: TableColumnsType = [
     {
         title: "用户名",
         dataIndex: "author",
+    },
+    {
+        title: "贡献",
+        dataIndex: "_count",
     },
     // {
     //     title: "帐号",
@@ -131,6 +136,22 @@ const FetchTableData = async () => {
                     </div>
                     <span>{{ record.email }}</span>
                 </div>
+            </template>
+            <template v-if="column.dataIndex == '_count'">
+                <Space :direction="'vertical'">
+                    <Tag color="default">
+                        <template #icon>
+                            <FileTextOutlined />
+                        </template>
+                        {{ record._count.posts }}
+                    </Tag>
+                    <Tag color="green">
+                        <template #icon>
+                            <MessageOutlined />
+                        </template>
+                        {{ record._count.comments }}
+                    </Tag>
+                </Space>
             </template>
             <template v-else-if="column.dataIndex == 'authorUrl'">
                 <a :href="record.authorUrl" target="_blank">{{ record.authorUrl }}</a>

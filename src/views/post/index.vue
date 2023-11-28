@@ -11,6 +11,11 @@ import { OptimizeImageURL } from "@/utils/utils"
 const router = useRouter();
 const columns: TableColumnsType = [
     {
+        title: "ID",
+        dataIndex: "id",
+        width: 80,
+    },
+    {
         title: "封面",
         dataIndex: "covers",
         width: 80
@@ -20,11 +25,6 @@ const columns: TableColumnsType = [
         dataIndex: "otherInfo",
         width: 80,
         ellipsis: true
-    },
-    {
-        title: "ID",
-        dataIndex: "id",
-        width: 80,
     },
     {
         title: "状态",
@@ -194,7 +194,7 @@ const handleDelPost = (post: ResPost) => {
                         <template #icon>
                             <MessageOutlined />
                         </template>
-                        {{ record.commentCount }}
+                        {{ record._count.comments }}
                     </Tag>
                 </Space>
             </template>
