@@ -192,6 +192,7 @@ const FetchTableData = async () => {
 
 .detail-wrap>p {
     font-weight: bold;
+    white-space: pre-wrap;
     word-break: break-word;
 }
 
