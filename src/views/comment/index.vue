@@ -13,7 +13,7 @@ const columns: TableColumnsType = [
     },
     {
         title: "评论",
-        dataIndex: "content",
+        dataIndex: "content"
     },
     {
         title: "作者",
@@ -122,6 +122,15 @@ const FetchTableData = async () => {
 <template>
     <Table :loading="tableLoading" :scroll="{ x: true }" :row-key="record => record.id" :columns="columns"
         :pagination="pagination" :data-source="tableData" @change="handleTableChange">
+        <template #expandedRowRender="{ record }">
+            <div class="detail-wrap">
+                <div class="parent-info">
+                    <span>父ID:{{ record.parent?.id || '空' }}</span>
+                    <span>父评论:{{ record.parent?.content || '空' }}</span>
+                </div>
+                <p>回复：{{ record.content }}</p>
+            </div>
+        </template>
         <template #bodyCell="{ column, record, text }">
             <template v-if="column.dataIndex == 'email'">
                 <div class="email-wrap">
@@ -132,7 +141,7 @@ const FetchTableData = async () => {
                 </div>
             </template>
             <template v-else-if="column.dataIndex == 'content'">
-                <b>{{ record.content }}</b>
+                <p class="comment-text">{{ record.content }}</p>
             </template>
             <template v-else-if="column.dataIndex == 'user'">
                 <p>{{ record.author?.author || '该账户已删除' }}</p>
@@ -179,5 +188,25 @@ const FetchTableData = async () => {
     height: 30px;
     border-radius: 5px;
     overflow: hidden;
+}
+
+.detail-wrap>p {
+    font-weight: bold;
+    word-break: break-word;
+}
+
+.parent-info {
+    font-size: 12px;
+    display: flex;
+    gap: 10px;
+    opacity: 0.8;
+}
+
+.comment-text {
+    font-weight: bold;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>
