@@ -1,4 +1,4 @@
-import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
+import LemFetch, { IResultData, FilterOptions } from "@/utils/MyFetch";
 
 export type UserRole = "Admin" | "Custom";
 
@@ -40,9 +40,9 @@ interface UserQuery {
 }
 
 export const FetchUserList = (
-  data?: UserQuery & PageOptions
+  data?: UserQuery & FilterOptions
 ): Promise<IResultData<IUser[]>> => {
-  return LemFetch.get<PageOptions>(`/admin/user`, data);
+  return LemFetch.get<FilterOptions>(`/admin/user`, data);
 };
 
 export const FetchMineInfo = (): Promise<IResultData<ResMe>> => {

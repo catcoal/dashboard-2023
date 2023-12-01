@@ -1,4 +1,4 @@
-import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
+import LemFetch, { IResultData, FilterOptions } from "@/utils/MyFetch";
 
 export type TagType = "Category" | "ArticleTag";
 export interface ITag {
@@ -9,7 +9,7 @@ export interface ITag {
   weight?: number;
 }
 
-export interface TagQuery extends PageOptions {
+export interface TagQuery extends FilterOptions {
   name?: string;
   type?: TagType;
 }

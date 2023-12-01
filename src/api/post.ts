@@ -1,4 +1,4 @@
-import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
+import LemFetch, { IResultData, FilterOptions } from "@/utils/MyFetch";
 import { ITag } from "./tag";
 
 // export type PostStatus = "Publish" | "Private" | "Draft" | "Encrypt";
@@ -55,9 +55,9 @@ export interface ResPost {
 
 // 获取文章列表
 export const FetchPostList = (
-  data: PageOptions
+  data: FilterOptions
 ): Promise<IResultData<ResPost[]>> => {
-  return LemFetch.get<PageOptions>(`/admin/post`, data);
+  return LemFetch.get<FilterOptions>(`/admin/post`, data);
 };
 
 // 获取文章详情

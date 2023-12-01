@@ -1,4 +1,4 @@
-import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
+import LemFetch, { IResultData, FilterOptions } from "@/utils/MyFetch";
 
 export type CommentStatusType = "Unreviewed" | "Show" | "Hide" | "Rubbish";
 
@@ -23,7 +23,7 @@ export interface Comment {
 }
 
 export const FetchComments = (
-  data: PageOptions
+  data: FilterOptions
 ): Promise<IResultData<Comment[]>> => {
   return LemFetch.get("/admin/comments", data);
 };

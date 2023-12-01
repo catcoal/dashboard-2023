@@ -1,4 +1,4 @@
-import LemFetch, { IResultData, PageOptions } from "@/utils/MyFetch";
+import LemFetch, { IResultData, FilterOptions } from "@/utils/MyFetch";
 
 export interface ResourceQuery {
   remotePath: string;
@@ -14,7 +14,7 @@ export interface Resource {
 
 // 获取素材
 export const FetchResources = (
-  query: ResourceQuery & PageOptions
+  query: ResourceQuery & FilterOptions
 ): Promise<IResultData<Resource[]>> => {
   return LemFetch.get("/resources", query);
 };
