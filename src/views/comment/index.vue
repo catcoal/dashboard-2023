@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import StatusFilter from "./components/status-filter.vue";
+import DateFilter from "@/components/date-filter/date-filter.vue";
 import { Table, TableColumnsType, TableProps, Tag, Button, message, Space } from 'ant-design-vue';
 import { FetchComments, UpdateComment, DeleteComment, CommentStatus, Comment, CommentStatusType } from "@/api/comment";
-import { h, onMounted, ref } from 'vue';
+import { h, onMounted, ref, reactive } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { ThemeColor } from "@/config/app";
 import { ParseTime } from "@/utils/date";
@@ -10,6 +12,10 @@ const columns: TableColumnsType = [
     {
         title: "ID",
         dataIndex: "id",
+    },
+    {
+        title: "状态",
+        dataIndex: "status",
     },
     {
         title: "评论",
@@ -28,14 +34,17 @@ const columns: TableColumnsType = [
         dataIndex: "createdAt",
     },
     {
-        title: "状态",
-        dataIndex: "status",
-    },
-    {
         title: "操作",
         dataIndex: "operation"
     }
 ];
+const filterForm = reactive<{
+    date: number,
+    status: CommentStatusType
+}>({
+    date: 0,
+    status: "Unreviewed"
+});
 
 const statusLoading = ref<boolean>(false);
 const tableData = ref<Comment[]>();
@@ -102,7 +111,12 @@ const handleTableChange: TableProps['onChange'] = (pag, filters, sorter) => {
 const FetchTableData = async () => {
     tableLoading.value = true;
     try {
+        const OneDay = 24 * 60 * 60 * 1000;
+        const DayAgo = new Date().getTime() - OneDay * filterForm.date;
+
         const { data, meta } = await FetchComments({
+            status: filterForm.status,
+            startDate: filterForm.date ? DayAgo : 0,
             page: pagination.value.current,
             pageSize: pagination.value.pageSize
         });
@@ -120,6 +134,10 @@ const FetchTableData = async () => {
 </script>
 
 <template>
+    <header>
+        <DateFilter @change="FetchTableData" v-model:value="filterForm.date"></DateFilter>
+        <StatusFilter @change="FetchTableData" v-model:value="filterForm.status"></StatusFilter>
+    </header>
     <Table :loading="tableLoading" :scroll="{ x: true }" :row-key="record => record.id" :columns="columns"
         :pagination="pagination" :data-source="tableData" @change="handleTableChange">
         <template #expandedRowRender="{ record }">
@@ -173,8 +191,10 @@ const FetchTableData = async () => {
 </template>
 
 <style scoped>
-.header-wrap {
-    margin-bottom: 10px;
+header {
+    display: flex;
+    gap: 10px;
+    padding: 0 0 10px 0;
 }
 
 .email-wrap {

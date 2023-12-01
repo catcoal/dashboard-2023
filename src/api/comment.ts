@@ -22,8 +22,12 @@ export interface Comment {
   childComments?: Comment[];
 }
 
+export interface CommentQuery {
+  status?: string;
+}
+
 export const FetchComments = (
-  data: FilterOptions
+  data: CommentQuery & FilterOptions
 ): Promise<IResultData<Comment[]>> => {
   return LemFetch.get("/admin/comments", data);
 };

@@ -1,5 +1,6 @@
 import { Token, CreateTimestamp } from "@/utils/auth";
 import { LemAntModal } from "@/utils/MyAnt";
+import { message } from "ant-design-vue";
 import router from "@/router";
 import { useAuth } from "@/stores/auth";
 
@@ -9,6 +10,8 @@ export interface IResultData<T> {
 }
 
 export interface FilterOptions {
+  startDate?: number;
+  endDate?: number;
   page?: number;
   pageSize?: number;
 }
@@ -51,8 +54,10 @@ class LemFetch {
         }
       } catch (error) {
         // 如果无法解析错误信息，使用默认错误消息
+        message.error("服务器错误0x001");
+        console.log(error);
       }
-      // throw `请求错误码为 ${response.status}: ${errorMessage}`;
+      message.error("服务器错误0x002");
       throw `${errorMessage}`;
     }
   }
