@@ -2,6 +2,7 @@
 import { Segmented } from 'ant-design-vue';
 import { SegmentedBaseOption } from 'ant-design-vue/es/segmented/src/segmented';
 import { reactive } from 'vue';
+import { ThemeColor } from '@/config/app';
 
 const emit = defineEmits({
     change: (payload: string | number) => payload
@@ -50,5 +51,9 @@ const change = (value: string | number) => {
 <style scoped>
 .ant-segmented {
     background-color: #fafafa;
+}
+
+:deep(.ant-segmented-item-selected .ant-segmented-item-label) {
+    color: v-bind(ThemeColor);
 }
 </style>

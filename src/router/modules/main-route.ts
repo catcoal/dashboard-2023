@@ -31,6 +31,7 @@ export const MainRoutes: RouteRecordRaw[] = [
   {
     path: "/comment",
     name: "comment",
+    redirect: "/comment/list",
     meta: {
       label: "评论管理",
     },

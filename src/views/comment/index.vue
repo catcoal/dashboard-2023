@@ -7,7 +7,9 @@ import { h, onMounted, ref, reactive } from 'vue';
 import { LemAntModal } from '@/utils/MyAnt';
 import { ThemeColor } from "@/config/app";
 import { ParseTime } from "@/utils/date";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const columns: TableColumnsType = [
     {
         title: "ID",
@@ -40,7 +42,7 @@ const columns: TableColumnsType = [
 ];
 const filterForm = reactive<{
     date: number,
-    status: CommentStatusType
+    status: CommentStatusType | ''
 }>({
     date: 0,
     status: "Unreviewed"
@@ -56,6 +58,9 @@ const pagination = ref({
 })
 
 onMounted(() => {
+    if (route.query.type === 'all') {
+        filterForm.status = ''
+    };
     FetchTableData();
 })
 

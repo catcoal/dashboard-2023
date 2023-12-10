@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons-vue';
 import { Menu, ItemType, MenuProps } from 'ant-design-vue';
-import { reactive, VueElement, h, computed, ref, onMounted } from 'vue';
+import { reactive, VueElement, h, computed, ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute, RouteRecordRaw, RouteMeta } from "vue-router";
 import { MainRoutes } from "@/router/modules/main-route";
 
@@ -14,6 +14,10 @@ const selectedMenuKeys = ref<string[]>([]);
 
 onMounted(async () => {
     await router.isReady();
+    selectedMenuKeys.value = [route.name as string];
+})
+
+watch(() => route.fullPath, () => {
     selectedMenuKeys.value = [route.name as string];
 })
 

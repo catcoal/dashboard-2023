@@ -9,7 +9,7 @@ const email = computed(() => meStore.MineInfo?.email);
 </script>
 
 <template>
-    <div class="user-box">
+    <div class="user-box Stereobox">
         <div class="avatar-wrap">
             <Gravatar class="avatar" :email="'1622455251@qq.com'"></Gravatar>
         </div>
@@ -22,9 +22,12 @@ const email = computed(() => meStore.MineInfo?.email);
 
 <style scoped>
 .user-box {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 25px;
+    gap: 15px;
+    background-color: #FFF;
+    padding: 15px 25px;
+    border-radius: 20px;
 }
 
 .user-infos {
@@ -34,18 +37,19 @@ const email = computed(() => meStore.MineInfo?.email);
 }
 
 .user-infos>h2 {
-    font-size: 30px;
+    font-size: 16px;
     letter-spacing: 1px;
+    font-weight: 500;
 }
 
 .user-infos>p {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.7;
 }
 
 .avatar-wrap {
-    width: 90px;
-    height: 90px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
 }
